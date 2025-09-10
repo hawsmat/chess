@@ -60,3 +60,29 @@ public class ChessPiece {
         }
         return List.of();
     }
+
+    public void upRight(){
+        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
+        for (int i = greatest; i < 9; i++) {
+            moves.add(new ChessPosition(x+1, y-1));
+        }
+    }
+    public void upLeft(){
+        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
+        for (int i = greatest; i < 9; i++) {
+            moves.add(new ChessPosition(x+1, y-1));
+        }
+    }
+    public void downRight(){
+        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
+        for (int i = greatest; i < 9; i++) {
+            moves.add(new ChessPosition(x+1, y-1));
+        }
+    }
+    public void downLeft(){
+        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
+        for (int i = greatest; i < 9; i++) {
+            moves.add(new ChessPosition(x+1, y-1));
+        }
+    }
+}
