@@ -13,6 +13,7 @@ public class ChessPiece {
 
     private ChessGame.TeamColor pieceColor;
     private ChessPiece.PieceType type;
+    private Collection<ChessMove> moves;
 
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -55,15 +56,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP) {
-
-            while ((myPosition.getRow() > 0 & myPosition.getRow() < 9) & (myPosition.getColumn() > 0 & myPosition.getColumn() < 9)){
-                for (int i = 0; i < 9; i++) {
-
-                }
-            }
-            return List.of(new ChessMove(new ChessPosition(5, 4), new ChessPosition(1, 2), null));
+            return List.of();
         }
-
         return List.of();
     }
-}
