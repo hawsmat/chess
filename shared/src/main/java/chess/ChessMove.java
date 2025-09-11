@@ -49,6 +49,14 @@ public class ChessMove {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessMove move = (ChessMove) o;
+        return (startPosition.equals(move.startPosition) && endPosition.equals(move.endPosition) && promotionPiece == move.promotionPiece);
+    }
+
+    @Override
     public int hashCode() {
         var promotionCode = (promotionPiece == null ? 9 : promotionPiece.ordinal());
             return (71 * startPosition.hashCode()) + endPosition.hashCode() + promotionCode;
