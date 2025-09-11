@@ -47,4 +47,10 @@ public class ChessMove {
     public String toString() {
         return String.format("%s%s", startPosition, endPosition);
     }
+
+    @Override
+    public int hashCode() {
+        var promotionCode = (promotionPiece == null ? 9 : promotionPiece.ordinal());
+            return (71 * startPosition.hashCode()) + endPosition.hashCode() + promotionCode;
+    }
 }

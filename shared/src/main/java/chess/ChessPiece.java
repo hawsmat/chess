@@ -57,51 +57,59 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP) {
-            upRight(myPosition);
-            upLeft(myPosition);
-            downLeft(myPosition);
-            downRight(myPosition);
+            upRight(myPosition, board);
+            upLeft(myPosition, board);
+            downLeft(myPosition, board);
+            downRight(myPosition, board);
             return moves;
         }
         return List.of();
     }
 
-    public void upRight(ChessPosition myPosition) {
+    public void upRight(ChessPosition myPosition, ChessBoard board) {
         int x = myPosition.getRow();
         int y = myPosition.getColumn();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             if (x + i < 9 & y + i < 9) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y + i), null));
+                if (board.getPiece(new ChessPosition(x+i, y+i)) == null) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y + i), null));
+                }
             }
         }
     }
 
-    public void upLeft(ChessPosition myPosition) {
+    public void upLeft(ChessPosition myPosition, ChessBoard board) {
         int x = myPosition.getRow();
         int y = myPosition.getColumn();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             if (x - i > 0 & y + i < 9) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y + i), null));
+                if (board.getPiece(new ChessPosition(x-i, y+i)) == null) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y + i), null));
+                }
             }
         }
     }
 
-    public void downRight(ChessPosition myPosition) {
+    public void downRight(ChessPosition myPosition, ChessBoard board) {
         int x = myPosition.getRow();
         int y = myPosition.getColumn();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             if (x + i < 9 & y - i > 0) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y - i), null));
+                if (board.getPiece(new ChessPosition(x+i, y-i)) == null) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y - i), null));
+                }
             }
         }
     }
 
-    public void downLeft(ChessPosition myPosition) {
+    public void downLeft(ChessPosition myPosition, ChessBoard board) {
         int x = myPosition.getRow();
         int y = myPosition.getColumn();
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             if (x - i > 0 & y - i > 0) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y - i), null));
+                if (board.getPiece(new ChessPosition(x-i, y-i)) == null) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y - i), null));
+                }
             }
         }
     }
