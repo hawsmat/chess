@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class ChessPiece {
 
     private ChessGame.TeamColor pieceColor;
     private ChessPiece.PieceType type;
-    private Collection<ChessMove> moves;
+    private List<ChessMove> moves = new ArrayList<>();
 
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -56,33 +57,52 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP) {
-            return List.of();
+            upRight(myPosition);
+            upLeft(myPosition);
+            downLeft(myPosition);
+            downRight(myPosition);
+            return moves;
         }
         return List.of();
     }
 
-    public void upRight(){
-        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
-        for (int i = greatest; i < 9; i++) {
-            moves.add(new ChessPosition(x+1, y-1));
+    public void upRight(ChessPosition myPosition) {
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        for (int i = 0; i < 9; i++) {
+            if (x + i < 9 & y + i < 9) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y + i), null));
+            }
         }
     }
-    public void upLeft(){
-        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
-        for (int i = greatest; i < 9; i++) {
-            moves.add(new ChessPosition(x+1, y-1));
+
+    public void upLeft(ChessPosition myPosition) {
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        for (int i = 0; i < 9; i++) {
+            if (x - i > 0 & y + i < 9) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y + i), null));
+            }
         }
     }
-    public void downRight(){
-        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
-        for (int i = greatest; i < 9; i++) {
-            moves.add(new ChessPosition(x+1, y-1));
+
+    public void downRight(ChessPosition myPosition) {
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        for (int i = 0; i < 9; i++) {
+            if (x + i < 9 & y - i > 0) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y - i), null));
+            }
         }
     }
-    public void downLeft(){
-        int greatest = Math.max(Math.abs(x), (Math.abs(y)));
-        for (int i = greatest; i < 9; i++) {
-            moves.add(new ChessPosition(x+1, y-1));
+
+    public void downLeft(ChessPosition myPosition) {
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        for (int i = 0; i < 9; i++) {
+            if (x - i > 0 & y - i > 0) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y - i), null));
+            }
         }
     }
 }

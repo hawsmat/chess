@@ -2,7 +2,7 @@ package chess;
 
 import java.util.Collection;
 
-public class Bishop (){
+public class Bishop {
     private Collection<ChessPosition> moves;
     int x;
     int y;
