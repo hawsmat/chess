@@ -74,6 +74,7 @@ public class ChessPiece {
                 if (board.getPiece(new ChessPosition(x+i, y+i)) == null) {
                     moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y + i), null));
                 }
+                break;
             }
         }
     }
@@ -86,6 +87,7 @@ public class ChessPiece {
                 if (board.getPiece(new ChessPosition(x-i, y+i)) == null) {
                     moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y + i), null));
                 }
+                break;
             }
         }
     }
@@ -98,6 +100,7 @@ public class ChessPiece {
                 if (board.getPiece(new ChessPosition(x+i, y-i)) == null) {
                     moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y - i), null));
                 }
+                break;
             }
         }
     }
@@ -110,6 +113,7 @@ public class ChessPiece {
                 if (board.getPiece(new ChessPosition(x-i, y-i)) == null) {
                     moves.add(new ChessMove(myPosition, new ChessPosition(x - i, y - i), null));
                 }
+                break;
             }
         }
     }
