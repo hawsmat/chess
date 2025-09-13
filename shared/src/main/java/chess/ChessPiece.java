@@ -68,15 +68,30 @@ public class ChessPiece {
     }
 
     public void diagonal(ChessPosition myPosition, ChessBoard board, int row, int col) {
-        int x = myPosition.getRow() + row;
-        int y = myPosition.getColumn() + col;
-        for (int i = 0; i < 8; i++) {
-            if (x+i < 9 && x+i > 0 && y+i < 9 && y+i > 0) {
-                if (board.getPiece(new ChessPosition(x+i, y+i)) == null) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(x + i, y - i), null));
+        for (int i = 1; i < 8; i++) {
+            int x = myPosition.getRow() + i*row;
+            int y = myPosition.getColumn() + i*col;
+            ChessPosition newPosition = new ChessPosition(x, y);
+            if (isValid(board, x, y, newPosition)) {
+                if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
+                    break;
+                }
+                else {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
                 }
             }
+            else {
+                break;
+            }
         }
+    }
+
+    public boolean isValid(ChessBoard board, int x, int y, ChessPosition newPosition) {
+        if (x < 9 && x > 0 && y < 9 && y > 0 && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
