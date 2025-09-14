@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -64,6 +61,14 @@ public class ChessPiece {
             diagonal(myPosition, board, -1, -1);
             return moves;
         }
+        else if (board.getPiece(myPosition).getPieceType() == PieceType.KING) {
+            calculateKing(myPosition, board);
+            return moves;
+        }
+        else if (board.getPiece(myPosition).getPieceType() == PieceType.KNIGHT) {
+            calculateKnight(myPosition, board);
+            return moves;
+        }
         return List.of();
     }
 
@@ -83,6 +88,48 @@ public class ChessPiece {
             }
             else {
                 break;
+            }
+        }
+    }
+
+    public void calculateKing(ChessPosition myPosition, ChessBoard board){
+        List<List<Integer>> rowsAndCols = Arrays.asList(
+                Arrays.asList(-1, -1),
+                Arrays.asList(-1, 0),
+                Arrays.asList(-1, 1),
+                Arrays.asList(0, -1),
+                Arrays.asList(0, 1),
+                Arrays.asList(1, -1),
+                Arrays.asList(1, 0),
+                Arrays.asList(1, 1)
+        );
+        for (int i = 0; i < rowsAndCols.size(); i++){
+            int x = myPosition.getRow() + rowsAndCols.get(i).get(0);
+            int y = myPosition.getColumn() + rowsAndCols.get(i).get(1);
+            ChessPosition newPosition = new ChessPosition(x, y);
+            if (isValid(board, x, y, newPosition)) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
+            }
+        }
+    }
+
+    public void calculateKnight(ChessPosition myPosition, ChessBoard board){
+        List<List<Integer>> rowsAndCols = Arrays.asList(
+                Arrays.asList(-2, -1),
+                Arrays.asList(-2, 1),
+                Arrays.asList(2, 1),
+                Arrays.asList(2, -1),
+                Arrays.asList(1, 2),
+                Arrays.asList(-1, 2),
+                Arrays.asList(1, -2),
+                Arrays.asList(-1, -2)
+        );
+        for (int i = 0; i < rowsAndCols.size(); i++){
+            int x = myPosition.getRow() + rowsAndCols.get(i).get(0);
+            int y = myPosition.getColumn() + rowsAndCols.get(i).get(1);
+            ChessPosition newPosition = new ChessPosition(x, y);
+            if (isValid(board, x, y, newPosition)) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
             }
         }
     }
