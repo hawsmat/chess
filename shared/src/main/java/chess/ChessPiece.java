@@ -55,10 +55,10 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP) {
-            calculateDiagonal(myPosition, board, 1, 1);
-            calculateDiagonal(myPosition, board, 1, -1);
-            calculateDiagonal(myPosition, board, -1, 1);
-            calculateDiagonal(myPosition, board, -1, -1);
+            calculateDiagonalAndSides(myPosition, board, 1, 1);
+            calculateDiagonalAndSides(myPosition, board, 1, -1);
+            calculateDiagonalAndSides(myPosition, board, -1, 1);
+            calculateDiagonalAndSides(myPosition, board, -1, -1);
             return moves;
         }
         else if (board.getPiece(myPosition).getPieceType() == PieceType.KING) {
@@ -78,12 +78,30 @@ public class ChessPiece {
                 calculatePawn(myPosition, board, -1, 7);
                 return moves;
             }
-
         }
+        else if (board.getPiece(myPosition).getPieceType() == PieceType.ROOK) {
+            calculateDiagonalAndSides(myPosition, board, 0, 1);
+            calculateDiagonalAndSides(myPosition, board, 0, -1);
+            calculateDiagonalAndSides(myPosition, board, 1, 0);
+            calculateDiagonalAndSides(myPosition, board, -1, 0);
+            return moves;
+        }
+        else if (board.getPiece(myPosition).getPieceType() == PieceType.QUEEN) {
+            calculateDiagonalAndSides(myPosition, board, 1, 1);
+            calculateDiagonalAndSides(myPosition, board, 1, -1);
+            calculateDiagonalAndSides(myPosition, board, -1, 1);
+            calculateDiagonalAndSides(myPosition, board, -1, -1);
+            calculateDiagonalAndSides(myPosition, board, 0, 1);
+            calculateDiagonalAndSides(myPosition, board, 0, -1);
+            calculateDiagonalAndSides(myPosition, board, 1, 0);
+            calculateDiagonalAndSides(myPosition, board, -1, 0);
+            return moves;
+        }
+
         return List.of();
     }
 
-    public void calculateDiagonal(ChessPosition myPosition, ChessBoard board, int row, int col) {
+    public void calculateDiagonalAndSides(ChessPosition myPosition, ChessBoard board, int row, int col) {
         for (int i = 1; i < 8; i++) {
             int x = myPosition.getRow() + i*row;
             int y = myPosition.getColumn() + i*col;
@@ -135,6 +153,7 @@ public class ChessPiece {
             moves.add(new ChessMove(myPosition, newPosition, type));
         }
     }
+
     public void pawnUp(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board){
         if (pawnIsValid(board, newPosition)) {
             moves.add(new ChessMove(myPosition, newPosition, type));
@@ -153,7 +172,6 @@ public class ChessPiece {
         }
         return false;
     }
-
 
     public void calculateKing(ChessPosition myPosition, ChessBoard board){
         List<List<Integer>> rowsAndCols = Arrays.asList(
