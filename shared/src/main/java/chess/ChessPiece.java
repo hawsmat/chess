@@ -102,15 +102,29 @@ public class ChessPiece {
             int x = myPosition.getRow() + rowsAndCols.get(i).get(0);
             int y = myPosition.getColumn() + rowsAndCols.get(i).get(1);
             ChessPosition newPosition = new ChessPosition(x, y);
-            if (i == 0 && isValid(board, x, y, newPosition)) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
-            }
-            else if (i == 1 && x-1 == 1) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
-            }
-            else if (i == 2 || i == 3) {
-                if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != pieceColor) {
+            if (isValid(board, x, y, newPosition)) {
+                if (i == 0) {
+                    if (pieceColor == ChessGame.TeamColor.WHITE && x == 8) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.BISHOP));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.QUEEN));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.ROOK));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.KNIGHT));
+                    }
+                    else if (pieceColor == ChessGame.TeamColor.BLACK && x == 1) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.BISHOP));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.QUEEN));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.ROOK));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), PieceType.KNIGHT));
+                    }
+                    else {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
+                    }
+                } else if (i == 1 && ((pieceColor == ChessGame.TeamColor.WHITE && x - 3 == 1) || (pieceColor == ChessGame.TeamColor.BLACK && x + 3 == 8))) {
                     moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
+                } else if (i == 2 || i == 3) {
+                    if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != pieceColor) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
+                    }
                 }
             }
         }
