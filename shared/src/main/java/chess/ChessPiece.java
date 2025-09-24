@@ -103,10 +103,8 @@ public class ChessPiece {
 
     public void calculateDiagonalAndSides(ChessPosition myPosition, ChessBoard board, int row, int col) {
         for (int i = 1; i < 8; i++) {
-            int x = myPosition.getRow() + i*row;
-            int y = myPosition.getColumn() + i*col;
-            ChessPosition newPosition = new ChessPosition(x, y);
-            if (isValid(board, x, y, newPosition)) {
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + i*row, myPosition.getColumn() + i*col);
+            if (isValid(board, newPosition)) {
                 if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != pieceColor) {
                     moves.add(new ChessMove(myPosition, newPosition, null));
                     break;
@@ -167,10 +165,7 @@ public class ChessPiece {
     }
 
     public boolean pawnIsValid(ChessBoard board, ChessPosition newPosition) {
-        if (newPosition.getRow() < 9 && newPosition.getRow() > 0 && newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && board.getPiece(newPosition) == null) {
-            return true;
-        }
-        return false;
+        return (newPosition.getRow() < 9 && newPosition.getRow() > 0 && newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && board.getPiece(newPosition) == null);
     }
 
     public void calculateKing(ChessPosition myPosition, ChessBoard board){
@@ -185,11 +180,9 @@ public class ChessPiece {
                 Arrays.asList(1, 1)
         );
         for (int i = 0; i < rowsAndCols.size(); i++){
-            int x = myPosition.getRow() + rowsAndCols.get(i).get(0);
-            int y = myPosition.getColumn() + rowsAndCols.get(i).get(1);
-            ChessPosition newPosition = new ChessPosition(x, y);
-            if (isValid(board, x, y, newPosition)) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1));
+            if (isValid(board, newPosition)) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
             }
         }
     }
@@ -206,20 +199,15 @@ public class ChessPiece {
                 Arrays.asList(-1, -2)
         );
         for (int i = 0; i < rowsAndCols.size(); i++){
-            int x = myPosition.getRow() + rowsAndCols.get(i).get(0);
-            int y = myPosition.getColumn() + rowsAndCols.get(i).get(1);
-            ChessPosition newPosition = new ChessPosition(x, y);
-            if (isValid(board, x, y, newPosition)) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(x, y), null));
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1));
+            if (isValid(board, newPosition)) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
             }
         }
     }
 
-    public boolean isValid(ChessBoard board, int x, int y, ChessPosition newPosition) {
-        if (x < 9 && x > 0 && y < 9 && y > 0 && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor)) {
-            return true;
-        }
-        return false;
+    public boolean isValid(ChessBoard board, ChessPosition newPosition) {
+        return (newPosition.getRow() < 9 && newPosition.getRow() > 0 && newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor));
     }
 
     @Override
