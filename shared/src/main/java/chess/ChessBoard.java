@@ -41,11 +41,6 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-//        for (int i = 1; i < 8; i++) {
-//            for (int j = 1; j < 8; j++) {
-//                addPiece(new ChessPosition(i, j), new ChessPiece(ChessGame.TeamColor.WHITE, null));
-//            }
-//        }
         List<ChessPiece.PieceType> pieces = Arrays.asList(
             ChessPiece.PieceType.ROOK,
             ChessPiece.PieceType.KNIGHT,
