@@ -97,7 +97,6 @@ public class ChessPiece {
             calculateDiagonalAndSides(myPosition, board, -1, 0);
             return moves;
         }
-
         return List.of();
     }
 
