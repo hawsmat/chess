@@ -50,7 +50,22 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        return board.getPiece(startPosition).pieceMoves(board, startPosition);
+        Collection<ChessMove> possibleMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
+        for (ChessMove move : possibleMoves) {
+            chess.ChessBoard tempBoard = new ChessBoard();
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; i < 9; i++) {
+                    ChessPosition position = new ChessPosition(i, j);
+                    tempBoard.addPiece(position, new ChessPiece(board.getPiece(position).getTeamColor(), board.getPiece(position).getPieceType()));
+                }
+            }
+            tempBoard.addPiece(move.getEndPosition(), tempBoard.getPiece(move.getStartPosition()));
+            tempBoard.addPiece(move.getStartPosition(), null);
+            if (isInCheck(board.getPiece(startPosition).getTeamColor()) || isInCheckmate(board.getPiece(startPosition).getTeamColor())) {
+                possibleMoves.remove(move);
+            }
+        }
+        return possibleMoves;
     }
 
     /**
@@ -91,10 +106,10 @@ public class ChessGame {
 
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> otherMoves = validMoves(position);
+                ChessPosition enemyPosition = new ChessPosition(i, j);
+                ChessPiece enemyPiece = board.getPiece(enemyPosition);
+                if (enemyPiece != null && enemyPiece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> otherMoves = validMoves(enemyPosition);
                     for (ChessMove move: otherMoves) {
                         if (move.getEndPosition().equals(kingPosition)) {
                             return true;
@@ -126,9 +141,12 @@ public class ChessGame {
                     }
                 }
             }
-            return canCapture(kingMoves, kingPosition, teamColor);
-            return canMove(kingMoves, kingPosition, teamColor);
-            return canBlock(kingMoves, kingPosition, teamColor);
+            if (canCapture(kingPosition, teamColor) || canMove(kingMoves, teamColor) || canBlock(kingMoves, teamColor)){
+                return false;
+            }
+            else {
+                return true;
+            }
         }
         return false;
     }
@@ -189,7 +207,9 @@ public class ChessGame {
         return canMove;
     }
 
-    public boolean canBlock(Collection<ChessMove> kingMoves, ChessPosition kingPosition, TeamColor teamColor) {
+    public boolean canBlock(Collection<ChessMove> kingMoves, TeamColor teamColor) {
+        Collection<ChessMove> attackingMoves = new ArrayList<>();
+        ChessPosition attackingLocation = new ChessPosition(0, 0);
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition position = new ChessPosition(i, j);
@@ -199,13 +219,38 @@ public class ChessGame {
                     for (ChessMove kingMove : kingMoves) {
                         for (ChessMove move: otherMoves) {
                             if (move.getEndPosition().equals(kingMove.getEndPosition())) {
-
+                                attackingLocation = position;
+                                attackingMoves = otherMoves;
                             }
                         }
                     }
                 }
             }
         }
+        if (board.getPiece(attackingLocation).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPiece(attackingLocation).getPieceType() == ChessPiece.PieceType.ROOK || board.getPiece(attackingLocation).getPieceType() == ChessPiece.PieceType.BISHOP){
+            for (int i = 1; i < 9; i++) {
+                for (int j = 1; j < 9; j++) {
+                    ChessPosition position = new ChessPosition(i, j);
+                    ChessPiece helpingPiece = board.getPiece(position);
+                    if (helpingPiece != null && helpingPiece.getTeamColor() == teamColor) {
+                        Collection<ChessMove> helpingMoves = validMoves(position);
+                        for (ChessMove move: helpingMoves) {
+                            for (ChessMove lines : attackingMoves) {
+                                if (lines.equals(move)) {
+                                    return true;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        else {
+            return false;
+        }
+
     }
 
     /**
@@ -216,7 +261,32 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = new ChessPosition(0, 0);
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    kingPosition = position;
+                }
+            }
+        }
+
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> otherMoves = validMoves(position);
+                    for (ChessMove move: otherMoves) {
+                        if (move.getEndPosition().equals(kingPosition)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
