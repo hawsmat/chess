@@ -63,7 +63,7 @@ public class ChessGame {
             }
             tempBoard.addPiece(move.getEndPosition(), tempBoard.getPiece(move.getStartPosition()));
             tempBoard.addPiece(move.getStartPosition(), null);
-            if (isInCheck(tempBoard.getPiece(move.getEndPosition()).getTeamColor()) || isInCheckmate(tempBoard.getPiece(move.getEndPosition()).getTeamColor())) {
+            if (isInCheck(getTeamTurn()) || isInCheckmate(getTeamTurn())) {
                 possibleMoves.remove(move);
             }
         }
@@ -77,10 +77,16 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (board.getPiece(move.getEndPosition()) == null) {
+//        if (board.getPiece(move.getEndPosition()) == null) {
+//            throw new InvalidMoveException("That's not good");
+//        }
+        if (board.getPiece(move.getStartPosition()) == null) {
             throw new InvalidMoveException("That's not good");
         }
         if (board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()){
+            throw new InvalidMoveException("That's not good");
+        }
+        if (board.getPiece(move.getEndPosition()) != null && board.getPiece(move.getEndPosition()).getTeamColor() == getTeamTurn()) {
             throw new InvalidMoveException("That's not good");
         }
         Collection<ChessMove> possibleMoves = validMoves(move.getStartPosition());
@@ -97,6 +103,8 @@ public class ChessGame {
                 break;
             }
         }
+        throw new InvalidMoveException("That's not good");
+
     }
 
     /**
