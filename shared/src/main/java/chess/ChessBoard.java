@@ -13,8 +13,7 @@ import java.util.Objects;
  */
 public class ChessBoard {
     ChessPiece[][] board = new ChessPiece[8][8];
-    public ChessBoard() {
-    }
+    public ChessBoard() {}
 
     /**
      * Adds a chess piece to the chessboard
@@ -65,7 +64,7 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(board, that.board);
+        return Objects.equals(toString(), that.toString());
     }
 
     @Override
@@ -76,7 +75,8 @@ public class ChessBoard {
     @Override
     public String toString() {
         String str = "\n";
-        for (int i = 8; i > 1; i--) {
+        for (int i = 8; i > 0; i--) {
+            str += "|";
             for (int j = 1; j < 9; j++) {
                 ChessPosition position = new ChessPosition(i, j);
                 if (getPiece(position) == null) {
@@ -126,7 +126,9 @@ public class ChessBoard {
                     }
                 }
             }
-            str += "\n";
+            if (i > 1) {
+                str += "\n";
+            }
         }
         return str;
     }
