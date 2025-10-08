@@ -64,7 +64,7 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Objects.equals(toString(), that.toString());
+        return Objects.deepEquals(board, that.board);
     }
 
     @Override

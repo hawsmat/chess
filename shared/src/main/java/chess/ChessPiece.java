@@ -9,10 +9,11 @@ import java.util.*;
  * signature of the existing methods.
  */
 public class ChessPiece {
-
     final private ChessGame.TeamColor pieceColor;
     final private ChessPiece.PieceType type;
-    private List<ChessMove> moves = new ArrayList<>();
+
+//  moves is used in a bunch of
+    final private List<ChessMove> moves = new ArrayList<>();
 
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -215,7 +216,7 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type && Objects.equals(moves, that.moves);
+        return pieceColor == that.pieceColor && type == that.type;
     }
 
     @Override
