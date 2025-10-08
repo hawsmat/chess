@@ -4,21 +4,25 @@ import io.javalin.*;
 
 public class Server {
 
-    private final Javalin javalin;
+    private final Javalin server;
 
     public Server() {
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        server = Javalin.create(config -> config.staticFiles.add("web"));
+
+        server.delete("delete", ctx -> ctx.result("{}"));
+        server.post("user", ctx -> ctx.result("{ \"username\":\"joe\", \"authToken\":\"xyz\"}"));
+
 
         // Register your endpoints and exception handlers here.
 
     }
 
     public int run(int desiredPort) {
-        javalin.start(desiredPort);
-        return javalin.port();
+        server.start(desiredPort);
+        return server.port();
     }
 
     public void stop() {
-        javalin.stop();
+        server.stop();
     }
 }
