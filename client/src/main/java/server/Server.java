@@ -2,6 +2,7 @@ package server;
 
 import Service.UserService;
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import datamodel.User;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -10,9 +11,14 @@ import java.util.Map;
 public class Server {
 
     private final Javalin server;
-    private UserService userService = new UserService();
+    private UserService userService;
+    private DataAccess dataAccess;
+
 
     public Server() {
+//        dataAccess = new DataAccess();
+        userService = new UserService(dataAccess);
+
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         server.delete("delete", ctx -> ctx.result("{}"));
