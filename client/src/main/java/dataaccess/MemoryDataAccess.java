@@ -6,13 +6,18 @@ import java.util.HashMap;
 
 public class MemoryDataAccess implements DataAccess {
     private HashMap<String, User> users = new HashMap<>();
+
+    public void clear() {
+        users.clear();
+    }
+
     @Override
-    public void saveUse(User user) {
+    public void createUser(User user) {
         users.put(user.username(), user);
     }
 
     @Override
-    public void getUser(String username) {
-        users.get(username);
+    public User getUser(String username) {
+        return users.get(username);
     }
 }

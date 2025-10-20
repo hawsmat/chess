@@ -3,10 +3,10 @@ package server;
 import Service.UserService;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import dataaccess.MemoryDataAccess;
 import datamodel.User;
 import io.javalin.*;
 import io.javalin.http.Context;
-import java.util.Map;
 
 public class Server {
 
@@ -16,12 +16,12 @@ public class Server {
 
 
     public Server() {
-//        dataAccess = new DataAccess();
+        dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        server.delete("delete", ctx -> ctx.result("{}"));
+        server.delete("/db", ctx -> {dataAccess.clear(); ctx.status(200); ctx.result("{}");});
         server.post("user", ctx -> register(ctx));
 
 
@@ -31,9 +31,7 @@ public class Server {
 
     private void register(Context ctx) {
         var serializer = new Gson();
-        String reqJson = ctx.body();
         var req = serializer.fromJson(ctx.body(), User.class);
-
         var res = userService.register(req);
 
         ctx.result(serializer.toJson(res));

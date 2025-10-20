@@ -9,6 +9,7 @@ public class UserService {
     public UserService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
+
     public RegistrationResult register(User user) {
         return new RegistrationResult(user.username(), "zzyz");
     }
