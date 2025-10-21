@@ -2,6 +2,7 @@ package server;
 
 import Service.UserService;
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.UserDataAccess;
 import model.UserData;
 import io.javalin.*;
@@ -28,7 +29,7 @@ public class Server {
 
     }
 
-    private void register(Context ctx) {
+    private void register(Context ctx) throws DataAccessException {
         var serializer = new Gson();
         var req = serializer.fromJson(ctx.body(), UserData.class);
         var res = userService.register(req);

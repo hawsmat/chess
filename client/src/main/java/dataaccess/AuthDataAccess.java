@@ -26,4 +26,8 @@ public class AuthDataAccess {
     public void clear() {
         authDatas.clear();
     }
+
+    public void delete(String username) {
+        authDatas.remove(username);
+    }
 }

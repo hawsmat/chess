@@ -19,4 +19,8 @@ public class UserDataAccess {
     public UserData getUser(String username) {
         return users.get(username);
     }
+
+    public void delete(String username) {
+        users.remove(username);
+    }
 }

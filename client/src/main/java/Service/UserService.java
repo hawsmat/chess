@@ -7,6 +7,7 @@ import model.AuthData;
 import model.LoginData;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class UserService {
@@ -25,7 +26,20 @@ public class UserService {
             throw new DataAccessException("username already exists");
         }
     }
-    public AuthData login(LoginData) {
+    public AuthData login(LoginData loginData) throws DataAccessException {
+        if (userDataAccess.getUser(loginData.username()) == null) {
+            throw new DataAccessException("username does not exist");
+        }
+        if (!loginData.password().equals(userDataAccess.getUser(loginData.username()).password())) {
+            throw new DataAccessException("incorrect password");
+        }
+        return authDataAccess.createAuthData(loginData.username());
+    }
 
+    public void logout(AuthData authData) throws DataAccessException {
+        if (authDataAccess.getAuthData(authData.username()) == null) {
+            throw new DataAccessException("incorrect authData");
+        }
+        authDataAccess.delete(authData.username());
     }
 }
