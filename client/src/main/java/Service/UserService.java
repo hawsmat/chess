@@ -1,16 +1,19 @@
 package Service;
 
-import dataaccess.DataAccess;
-import datamodel.RegistrationResult;
-import datamodel.User;
+import dataaccess.UserDataAccess;
+import model.AuthData;
+import model.UserData;
+
+import java.util.UUID;
 
 public class UserService {
-    private DataAccess dataAccess;
-    public UserService(DataAccess dataAccess) {
+    private UserDataAccess dataAccess;
+    public UserService(UserDataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
-    public RegistrationResult register(User user) {
-        return new RegistrationResult(user.username(), "zzyz");
+    public AuthData register(UserData user) {
+        String authToken = UUID.randomUUID().toString();
+        return new AuthData(user.username(), authToken);
     }
 }

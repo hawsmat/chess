@@ -2,9 +2,8 @@ package server;
 
 import Service.UserService;
 import com.google.gson.Gson;
-import dataaccess.DataAccess;
-import dataaccess.MemoryDataAccess;
-import datamodel.User;
+import dataaccess.UserDataAccess;
+import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
 
@@ -12,11 +11,11 @@ public class Server {
 
     private final Javalin server;
     private UserService userService;
-    private DataAccess dataAccess;
+    private UserDataAccess dataAccess;
 
 
     public Server() {
-        dataAccess = new MemoryDataAccess();
+        dataAccess = new UserDataAccess();
         userService = new UserService(dataAccess);
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
@@ -31,7 +30,7 @@ public class Server {
 
     private void register(Context ctx) {
         var serializer = new Gson();
-        var req = serializer.fromJson(ctx.body(), User.class);
+        var req = serializer.fromJson(ctx.body(), UserData.class);
         var res = userService.register(req);
 
         ctx.result(serializer.toJson(res));

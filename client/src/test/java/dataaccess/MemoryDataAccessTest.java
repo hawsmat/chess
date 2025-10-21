@@ -1,16 +1,16 @@
 package dataaccess;
 
 import org.junit.jupiter.api.Test;
-import datamodel.User;
+import model.UserData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemoryDataAccessTest {
+class UserDataAccessTest {
 
     @Test
     void clear() {
-        var user = new User("joe", "j@j", "j");
-        DataAccess da = new MemoryDataAccess();
+        var user = new UserData("joe", "j@j", "j");
+        UserDataAccess da = new UserDataAccess();
         da.createUser(user);
         assertNotNull(da.getUser(user.username()));
         da.clear();
@@ -19,7 +19,10 @@ class MemoryDataAccessTest {
 
     @Test
     void CreateUser() {
-
+        var user = new UserData("joe", "j@j", "j");
+        UserDataAccess da = new UserDataAccess();
+        da.createUser(user);
+        assertEquals(user.username(), da.getUser(user.username()).username());
     }
 
     @Test
