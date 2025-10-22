@@ -1,10 +1,13 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class MemoryDataAccess implements DataAccess {
@@ -48,12 +51,19 @@ public class MemoryDataAccess implements DataAccess {
     public void deleteAuthData(String authToken) {authDatas.remove(authToken);}
 
     @Override
-    public int createGame(String gameName) {
-        return 0;
+    public int addGame(String gameName) {
+        gameIDs.put(gameID, new GameData(gameID, "", "", gameName, new ChessGame()));
+        gameID++;
+        return gameID-1;
     }
 
     @Override
     public GameData getGame(int gameID) {return gameIDs.get(gameID);}
+
+    @Override
+    public Set<Integer> getGames() {
+        return gameIDs.keySet();
+    }
 
     @Override
     public void updateGame() {}

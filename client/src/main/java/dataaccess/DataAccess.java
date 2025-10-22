@@ -4,6 +4,8 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.util.Set;
+
 public interface DataAccess {
     void clearUserData();
     void createUser(UserData user);
@@ -13,9 +15,11 @@ public interface DataAccess {
     AuthData getAuthData(String username);
     void clearAuthData();
     void deleteAuthData(String username);
-    int createGame(String gameName);
+    int addGame(String gameName);
     GameData getGame(int gameID);
+    Set<Integer> getGames();
     void updateGame();
+    String getWhiteUsername();
+    String getBlackUsername();
     void clearGameData();
-    void clear();
 }

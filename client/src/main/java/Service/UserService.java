@@ -7,7 +7,7 @@ import model.LoginData;
 import model.UserData;
 
 public class UserService {
-    private MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
+    private MemoryDataAccess memoryDataAccess;
     public UserService(MemoryDataAccess memoryDataAccess) {
         this.memoryDataAccess = memoryDataAccess;
     }
