@@ -6,7 +6,6 @@ import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,15 +65,36 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame() {}
+    public void updateGame(int gameID, ChessGame.TeamColor teamColor, String username) {
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            gameIDs.replace(gameID, new GameData(gameID, username, getBlackUsername(gameID), getGameName(gameID), getChessGame(gameID)));
+        }
+        else {
+            gameIDs.replace(gameID, new GameData(gameID, getWhiteUsername(gameID), username, getGameName(gameID), getChessGame(gameID)));
+        }
+    }
+
+    @Override
+    public String getWhiteUsername(int gameID){
+        return gameIDs.get(gameID).whiteUsername();
+    }
+
+    @Override
+    public String getBlackUsername(int gameID){
+        return gameIDs.get(gameID).blackUsername();
+    }
+
+    @Override
+    public String getGameName(int gameID) {
+        return gameIDs.get(gameID).gameName();
+    }
+
+    @Override
+    public ChessGame getChessGame(int gameID) {return gameIDs.get(gameID).game();}
 
     @Override
     public void clearGameData() {gameIDs.clear();}
 
     @Override
-    public void clear(){
-        clearAuthData();
-        clearGameData();
-        clearUserData();
-    }
+    public boolean isAuthorized(String authToken){return (getAuthData(authToken) != null);}
 }

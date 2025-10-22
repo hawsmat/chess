@@ -18,7 +18,7 @@ public class GameService {
 
     private List<GameData> listGames(String authToken) throws DataAccessException{
         List<GameData> gameData = new ArrayList<>();
-        if (isAuthorized(authToken)) {
+        if (memoryDataAccess.isAuthorized(authToken)) {
             for (int gameID: memoryDataAccess.getGames()) {
                 gameData.add(memoryDataAccess.getGame(gameID));
             }
@@ -28,23 +28,28 @@ public class GameService {
     }
 
     private int createGame(String authToken, String gameName) throws DataAccessException {
-        if (isAuthorized(authToken)) {
+        if (memoryDataAccess.isAuthorized(authToken)) {
             return memoryDataAccess.addGame(gameName);
         }
         throw new DataAccessException("not authorized");
     }
 
     private void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
-        if (isAuthorized(authToken)) {
+        if (memoryDataAccess.isAuthorized(authToken)) {
             if (memoryDataAccess.getGame(gameID) != null) {
-//                if (memoryDataAccess.getGames(gameID)) {}
+                if (playerColor == ChessGame.TeamColor.WHITE){
+                    if (memoryDataAccess.getWhiteUsername(gameID).isEmpty()) {
+                        memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
+                    }
+                }
+                else {
+                    if (memoryDataAccess.getBlackUsername(gameID).isEmpty()) {
+                        memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
+                    }
+                }
             }
             throw new DataAccessException("gameID does not exist");
         }
         throw new DataAccessException("not authorized");
-    }
-
-    public boolean isAuthorized(String authToken) {
-        return (memoryDataAccess.getAuthData(authToken) != null);
     }
 }

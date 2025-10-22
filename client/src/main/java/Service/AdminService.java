@@ -1,7 +1,7 @@
 package Service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
-import model.AuthData;
 
 public class AdminService {
     private MemoryDataAccess memoryDataAccess;
@@ -9,7 +9,12 @@ public class AdminService {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    public void clear(AuthData authData) {
-
+    public void clear(String authToken) throws DataAccessException {
+        if (memoryDataAccess.isAuthorized(authToken)) {
+            memoryDataAccess.clearUserData();
+            memoryDataAccess.clearGameData();
+            memoryDataAccess.clearUserData();
+        }
+        throw new DataAccessException("not authorized");
     }
 }
