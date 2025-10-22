@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class MemoryDataAccess implements DataAccess {
     private HashMap<String, UserData> users = new HashMap<>();
-    private HashMap<String, GameData> gameIDs = new HashMap<>();
+    private HashMap<Integer, GameData> gameIDs = new HashMap<>();
     int gameID = 0;
     private HashMap<String, AuthData> authDatas = new HashMap<>();
 
@@ -29,24 +29,23 @@ public class MemoryDataAccess implements DataAccess {
     public AuthData createAuthData(String username) {
         String authToken = UUID.randomUUID().toString();
         while (true) {
-            if (!authDatas.containsValue(authToken)) {
+            if (!authDatas.containsKey(authToken)) {
                 break;
             }
         }
         AuthData authData = new AuthData(username, authToken);
-        authDatas.put(username, authData);
+        authDatas.put(authToken, authData);
         return authData;
     }
 
     @Override
-    public AuthData getAuthData(String username) {return authDatas.get(username);}
+    public AuthData getAuthData(String authToken) {return authDatas.get(authToken);}
 
     @Override
     public void clearAuthData() {authDatas.clear();}
 
     @Override
-    public void deleteAuthData(String username) {authDatas.remove(username);}
-
+    public void deleteAuthData(String authToken) {authDatas.remove(authToken);}
 
     @Override
     public int createGame(String gameName) {
@@ -54,14 +53,10 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData getGame(String gameName) {
-        return null;
-    }
+    public GameData getGame(int gameID) {return gameIDs.get(gameID);}
 
     @Override
-    public void updateGame() {
-
-    }
+    public void updateGame() {}
 
     @Override
     public void clearGameData() {gameIDs.clear();}

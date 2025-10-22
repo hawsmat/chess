@@ -31,14 +31,14 @@ public class UserService {
         return memoryDataAccess.createAuthData(loginData.username());
     }
 
-    public void logout(AuthData authData) throws DataAccessException {
-        if (memoryDataAccess.getAuthData(authData.username()) == null) {
-            throw new DataAccessException("incorrect authData");
+    public void logout(String authToken) throws DataAccessException {
+        if (!isAuthorized(authToken)) {
+            throw new DataAccessException("incorrect authToken");
         }
-        memoryDataAccess.deleteUserData(authData.username());
+        memoryDataAccess.deleteAuthData(authToken);
     }
 
-    public boolean authorzie(String authToken) {
-        return true;
+    public boolean isAuthorized(String authToken) {
+        return (memoryDataAccess.getAuthData(authToken) != null);
     }
 }

@@ -14,7 +14,7 @@ public interface DataAccess {
     void clearAuthData();
     void deleteAuthData(String username);
     int createGame(String gameName);
-    GameData getGame(String gameName);
+    GameData getGame(int gameID);
     void updateGame();
     void clearGameData();
     void clear();
