@@ -3,7 +3,7 @@ package server;
 import Service.UserService;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import dataaccess.UserDataAccess;
+import dataaccess.MemoryDataAccess;
 import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -12,16 +12,16 @@ public class Server {
 
     private final Javalin server;
     private UserService userService;
-    private UserDataAccess dataAccess;
+    private MemoryDataAccess memoryDataAccess;
 
 
     public Server() {
-        dataAccess = new UserDataAccess();
-        userService = new UserService(dataAccess);
+        memoryDataAccess = new MemoryDataAccess();
+        userService = new UserService(memoryDataAccess);
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        server.delete("/db", ctx -> {dataAccess.clear(); ctx.status(200); ctx.result("{}");});
+        server.delete("/db", ctx -> {memoryDataAccess.clear(); ctx.status(200); ctx.result("{}");});
         server.post("user", ctx -> register(ctx));
 
 

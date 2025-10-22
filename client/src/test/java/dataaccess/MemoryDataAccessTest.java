@@ -5,12 +5,12 @@ import model.UserData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserDataAccessTest {
+class MemoryDataAccessTest {
 
     @Test
     void clear() {
         var user = new UserData("joe", "j@j", "j");
-        UserDataAccess da = new UserDataAccess();
+        MemoryDataAccess da = new MemoryDataAccess();
         da.createUser(user);
         assertNotNull(da.getUser(user.username()));
         da.clear();
@@ -20,7 +20,7 @@ class UserDataAccessTest {
     @Test
     void CreateUser() {
         var user = new UserData("joe", "j@j", "j");
-        UserDataAccess da = new UserDataAccess();
+        MemoryDataAccess da = new MemoryDataAccess();
         da.createUser(user);
         assertEquals(user.username(), da.getUser(user.username()).username());
     }
