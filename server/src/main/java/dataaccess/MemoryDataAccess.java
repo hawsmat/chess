@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+import model.LoginData;
 import model.UserData;
 
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class MemoryDataAccess implements DataAccess {
-    private HashMap<String, UserData> users = new HashMap<>();
+    private HashMap<String, LoginData> users = new HashMap<>();
     private HashMap<Integer, GameData> gameIDs = new HashMap<>();
     int gameID = 0;
     private HashMap<String, AuthData> authDatas = new HashMap<>();
@@ -19,23 +20,16 @@ public class MemoryDataAccess implements DataAccess {
     public void clearUserData() throws DataAccessException {users.clear();}
 
     @Override
-    public void createUser(UserData user) throws DataAccessException {users.put(user.username(), user);}
+    public void createUser(UserData user) throws DataAccessException {users.put(user.username(), new LoginData(user.username(), user.password()));}
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {return users.get(username);}
-
-    @Override
-    public void deleteUserData(String username) throws DataAccessException {users.remove(username);}
+    public LoginData getUser(String username) throws DataAccessException {
+        return users.get(username);}
 
     @Override
     public AuthData createAuthData(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
-        while (true) {
-            if (!authDatas.containsKey(authToken)) {
-                break;
-            }
-        }
-        AuthData authData = new AuthData(username, authToken);
+        AuthData authData = new AuthData(authToken, username);
         authDatas.put(authToken, authData);
         return authData;
     }

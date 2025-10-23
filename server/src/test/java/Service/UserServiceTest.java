@@ -1,7 +1,9 @@
 package Service;
 
+import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.UnauthorizedException;
 import model.AuthData;
 import model.LoginData;
 import model.UserData;
@@ -27,7 +29,7 @@ class UserServiceTest {
         UserData user = new UserData("matt", "joe", "email");
         UserData user2 = new UserData("matt", "joe", "email");
         userService.register(user);
-        assertThrows(DataAccessException.class, () -> userService.register(user2));
+        assertThrows(AlreadyTakenException.class, () -> userService.register(user2));
     }
 
     @Test
@@ -47,7 +49,7 @@ class UserServiceTest {
         UserData user = new UserData("matt", "joe", "email");
         assertDoesNotThrow(() -> userService.register(user));
         LoginData wrongLogin = new LoginData("username", user.password());
-        assertThrows(DataAccessException.class, () -> userService.login(wrongLogin));
+        assertThrows(UnauthorizedException.class, () -> userService.login(wrongLogin));
     }
 
     @Test
@@ -57,7 +59,7 @@ class UserServiceTest {
         UserData user = new UserData("matt", "joe", "email");
         assertDoesNotThrow(() -> userService.register(user));
         LoginData login = new LoginData(user.username(), "matt");
-        assertThrows(DataAccessException.class, () -> userService.login(login));
+        assertThrows(UnauthorizedException.class, () -> userService.login(login));
     }
 
     @Test
@@ -73,7 +75,7 @@ class UserServiceTest {
     void logoutFailureWrongAuthToken() {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
-        assertThrows(DataAccessException.class, () -> userService.logout("a"));
+        assertThrows(UnauthorizedException.class, () -> userService.logout("a"));
     }
 
     @Test
@@ -83,6 +85,6 @@ class UserServiceTest {
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
         assertDoesNotThrow(() -> userService.logout(authData.authToken()));
-        assertThrows(DataAccessException.class, ()-> userService.logout(authData.authToken()));
+        assertThrows(UnauthorizedException.class, ()-> userService.logout(authData.authToken()));
     }
 }

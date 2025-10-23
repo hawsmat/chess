@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+import model.LoginData;
 import model.UserData;
 
 import java.util.Set;
@@ -10,8 +11,7 @@ import java.util.Set;
 public interface DataAccess {
     void clearUserData() throws DataAccessException;
     void createUser(UserData user) throws DataAccessException;
-    UserData getUser(String username) throws DataAccessException;
-    void deleteUserData(String username) throws DataAccessException;
+    LoginData getUser(String username) throws DataAccessException;
     AuthData createAuthData(String username) throws DataAccessException;
     AuthData getAuthData(String username) throws DataAccessException;
     void clearAuthData() throws DataAccessException;
