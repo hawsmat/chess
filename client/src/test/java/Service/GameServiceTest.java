@@ -63,7 +63,7 @@ class GameServiceTest {
     }
 
     @Test
-    void joinGameColorGameDoesntExist() {
+    void joinGameGameDoesntExist() {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);

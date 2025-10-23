@@ -2,8 +2,10 @@ package Service;
 
 
 import chess.ChessGame;
+import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.UnauthorizedException;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public class GameService {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    public List<GameData> listGames(String authToken) throws DataAccessException{
+    public List<GameData> listGames(String authToken) throws UnauthorizedException{
         List<GameData> gameData = new ArrayList<>();
         if (memoryDataAccess.isAuthorized(authToken)) {
             for (int gameID: memoryDataAccess.getGames()) {
@@ -24,17 +26,17 @@ public class GameService {
             }
             return gameData;
         }
-        throw new DataAccessException("not authorzied");
+        throw new UnauthorizedException("not authorzied");
     }
 
-    public int createGame(String authToken, String gameName) throws DataAccessException {
+    public int createGame(String authToken, String gameName) throws UnauthorizedException {
         if (memoryDataAccess.isAuthorized(authToken)) {
             return memoryDataAccess.addGame(gameName);
         }
-        throw new DataAccessException("not authorized");
+        throw new UnauthorizedException("not authorized");
     }
 
-    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws AlreadyTakenException, UnauthorizedException, DataAccessException  {
         if (memoryDataAccess.isAuthorized(authToken)) {
             if (memoryDataAccess.getGame(gameID) != null) {
                 if (playerColor == ChessGame.TeamColor.WHITE){
@@ -42,7 +44,7 @@ public class GameService {
                         memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
                     }
                     else {
-                        throw new DataAccessException("color already taken");
+                        throw new AlreadyTakenException("color already taken");
                     }
                 }
                 else {
@@ -50,7 +52,7 @@ public class GameService {
                         memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
                     }
                     else {
-                        throw new DataAccessException("color already taken");
+                        throw new AlreadyTakenException("color already taken");
                     }
                 }
             }
@@ -59,7 +61,7 @@ public class GameService {
             }
         }
         else {
-            throw new DataAccessException("not authorized");
+            throw new UnauthorizedException("not authorized");
         }
     }
 }

@@ -1,7 +1,9 @@
 package Service;
 
+import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.UnauthorizedException;
 import model.AuthData;
 import model.LoginData;
 import model.UserData;
@@ -12,33 +14,29 @@ public class UserService {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    public AuthData register(UserData user) throws DataAccessException {
+    public AuthData register(UserData user) throws AlreadyTakenException {
         if (memoryDataAccess.getUser(user.username()) == null) {
             memoryDataAccess.createUser(user);
             return memoryDataAccess.createAuthData(user.username());
         }
         else {
-            throw new DataAccessException("username already exists");
+            throw new AlreadyTakenException("username already exists");
         }
     }
-    public AuthData login(LoginData loginData) throws DataAccessException {
+    public AuthData login(LoginData loginData) throws UnauthorizedException, DataAccessException {
         if (memoryDataAccess.getUser(loginData.username()) == null) {
             throw new DataAccessException("username does not exist");
         }
         if (!loginData.password().equals(memoryDataAccess.getUser(loginData.username()).password())) {
-            throw new DataAccessException("incorrect password");
+            throw new UnauthorizedException("incorrect password");
         }
         return memoryDataAccess.createAuthData(loginData.username());
     }
 
-    public void logout(String authToken) throws DataAccessException {
-        if (!isAuthorized(authToken)) {
-            throw new DataAccessException("incorrect authToken");
+    public void logout(String authToken) throws UnauthorizedException {
+        if (!memoryDataAccess.isAuthorized(authToken)) {
+            throw new UnauthorizedException("incorrect authToken");
         }
         memoryDataAccess.deleteAuthData(authToken);
-    }
-
-    public boolean isAuthorized(String authToken) {
-        return (memoryDataAccess.getAuthData(authToken) != null);
     }
 }
