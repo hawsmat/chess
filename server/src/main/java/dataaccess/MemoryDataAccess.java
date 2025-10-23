@@ -13,7 +13,7 @@ import java.util.UUID;
 public class MemoryDataAccess implements DataAccess {
     private HashMap<String, LoginData> users = new HashMap<>();
     private HashMap<Integer, GameData> gameIDs = new HashMap<>();
-    int gameID = 0;
+    int gameID = 1;
     private HashMap<String, AuthData> authDatas = new HashMap<>();
 
     @Override

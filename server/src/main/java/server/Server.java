@@ -43,8 +43,7 @@ public class Server {
             var serializer = new Gson();
             UserData userData = serializer.fromJson(ctx.body(), UserData.class);
             if (userData.username() == null || userData.password() == null || userData.email() == null) {
-                ctx.status(400);
-                serializer.toJson(Map.of("message", "Error: bad request"));
+                ctx.status(400).json("{\"message\": \"Error: bad request\"}");
                 return;
             }
             try {
@@ -52,9 +51,10 @@ public class Server {
                 ctx.json(serializer.toJson(authData));
                 ctx.status(200);
             } catch (DataAccessException e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
             } catch (AlreadyTakenException e) {
-                ctx.status(403).json(Map.of("message", "Error: " + e.getMessage()));
+                ctx.status(403).json("{\"message\": \"Error: bad request\"}");
             }
         }
 
@@ -65,12 +65,12 @@ public class Server {
             try {
                 loginData = serializer.fromJson(ctx.body(), LoginData.class);
             } catch (Exception e) {
-                ctx.status(400).json(Map.of("message", "Error: bad request"));
+                ctx.status(400).json("{\"message\": \"Error: bad request\"}");
                 return;
             }
             if (loginData.username() == null || loginData.username().isEmpty() ||
                     loginData.password() == null || loginData.password().isEmpty()) {
-                ctx.status(400).json(Map.of("message", "Error: bad request"));
+                ctx.status(400).json("{\"message\": \"Error: bad request\"}");
                 return;
             }
 
@@ -82,7 +82,8 @@ public class Server {
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (DataAccessException e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
             }
         }
 
@@ -96,7 +97,8 @@ public class Server {
                 userService.logout(authToken);
                 ctx.status(200);
             } catch (DataAccessException e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             }
@@ -114,7 +116,8 @@ public class Server {
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (DataAccessException e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
             }
         }
 
@@ -124,20 +127,17 @@ public class Server {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
                 return;
             }
-            CreateGameData createGameData;
-            try {
-                createGameData = new Gson().fromJson(ctx.body(), CreateGameData.class);
-            } catch (Exception e) {
-                ctx.status(400).json(Map.of("message", "Error: bad request"));
-                return;
-            }
+            String gameName = ctx.body();
+            CreateGameData createGameData = new CreateGameData(authToken, gameName);
             try {
                 int gameID = gameService.createGame(createGameData);
-                ctx.status(200).json(Map.of("gameID", gameID));
+                String str = String.format("{\"gameID\": %d}", gameID);
+                ctx.status(200).json(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (DataAccessException e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
             }
         }
 
@@ -151,14 +151,15 @@ public class Server {
             try {
                 joinGameData = new Gson().fromJson(ctx.body(), JoinGameData.class);
             } catch (Exception e) {
-                ctx.status(400).json(Map.of("message", "Error: bad request"));
+                ctx.status(400).json("{\"message\": \"Error: bad request\"}");
                 return;
             }
             try {
                 gameService.joinGame(authToken, joinGameData);
                 ctx.status(200);
             } catch (DataAccessException e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             }
@@ -169,7 +170,8 @@ public class Server {
                 adminService.clear();
                 ctx.status(200);
             } catch (DataAccessException e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
             }
         }
 
