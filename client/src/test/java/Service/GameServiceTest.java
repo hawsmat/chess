@@ -59,8 +59,6 @@ class GameServiceTest {
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(authData.authToken(), "game"));
-        System.out.println(assertDoesNotThrow(() -> gameService.listGames(authData.authToken())));
-        System.out.println(gameID);
         assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, gameID));
     }
 
@@ -69,6 +67,9 @@ class GameServiceTest {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
+        UserData user = new UserData("matt", "joe", "email");
+        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
+        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, 1));
     }
 
     @Test
@@ -76,5 +77,10 @@ class GameServiceTest {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
+        UserData user = new UserData("matt", "joe", "email");
+        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(authData.authToken(), "game"));
+        assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, gameID));
+        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, gameID));
     }
 }

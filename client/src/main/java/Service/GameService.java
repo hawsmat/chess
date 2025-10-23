@@ -41,16 +41,25 @@ public class GameService {
                     if (memoryDataAccess.getWhiteUsername(gameID).isEmpty()) {
                         memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
                     }
+                    else {
+                        throw new DataAccessException("color already taken");
+                    }
                 }
-
                 else {
-                    if (memoryDataAccess.getBlackUsername(gameID).isEmpty()) {
+                    if (memoryDataAccess.getBlackUsername(gameID) == null) {
                         memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
+                    }
+                    else {
+                        throw new DataAccessException("color already taken");
                     }
                 }
             }
-            throw new DataAccessException("gameID does not exist");
+            else {
+                throw new DataAccessException("gameID does not exist");
+            }
         }
-        throw new DataAccessException("not authorized");
+        else {
+            throw new DataAccessException("not authorized");
+        }
     }
 }
