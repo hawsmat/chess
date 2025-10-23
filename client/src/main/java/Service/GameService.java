@@ -6,7 +6,9 @@ import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
+import model.CreateGameData;
 import model.GameData;
+import model.JoinGameData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +35,10 @@ public class GameService {
         }
     }
 
-    public int createGame(String authToken, String gameName) throws UnauthorizedException, DataAccessException {
+    public int createGame(CreateGameData createGameData) throws UnauthorizedException, DataAccessException {
          try {
-            if (memoryDataAccess.isAuthorized(authToken)) {
-                return memoryDataAccess.addGame(gameName);
+            if (memoryDataAccess.isAuthorized(createGameData.authToken())) {
+                return memoryDataAccess.addGame(createGameData.gameName());
             }
             throw new UnauthorizedException("not authorized");
         } catch (DataAccessException e) {
@@ -44,19 +46,19 @@ public class GameService {
          }
     }
 
-    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws AlreadyTakenException, UnauthorizedException, DataAccessException  {
+    public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException, UnauthorizedException, DataAccessException  {
         try {
             if (memoryDataAccess.isAuthorized(authToken)) {
-                if (memoryDataAccess.getGame(gameID) != null) {
-                    if (playerColor == ChessGame.TeamColor.WHITE) {
-                        if (memoryDataAccess.getWhiteUsername(gameID).isEmpty()) {
-                            memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
+                if (memoryDataAccess.getGame(joinGameData.gameID()) != null) {
+                    if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
+                        if (memoryDataAccess.getWhiteUsername(joinGameData.gameID()).isEmpty()) {
+                            memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(), memoryDataAccess.getAuthData(authToken).username());
                         } else {
                             throw new AlreadyTakenException("color already taken");
                         }
                     } else {
-                        if (memoryDataAccess.getBlackUsername(gameID) == null) {
-                            memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
+                        if (memoryDataAccess.getBlackUsername(joinGameData.gameID()) == null) {
+                            memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(), memoryDataAccess.getAuthData(authToken).username());
                         } else {
                             throw new AlreadyTakenException("color already taken");
                         }

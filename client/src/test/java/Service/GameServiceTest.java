@@ -3,9 +3,7 @@ package Service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +17,7 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(()-> gameService.createGame(authData.authToken(), "game"));
+        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
     }
 
     @Test
@@ -27,7 +25,7 @@ class GameServiceTest {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
-        assertThrows(DataAccessException.class, ()-> gameService.createGame("a", "game"));
+        assertThrows(DataAccessException.class, ()-> gameService.createGame(new CreateGameData("a", "game")));
     }
 
     @Test
@@ -37,7 +35,7 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(()-> gameService.createGame(authData.authToken(), "game"));
+        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
         assertDoesNotThrow(()->gameService.listGames(authData.authToken()));
     }
 
@@ -58,8 +56,8 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        int gameID = assertDoesNotThrow(()-> gameService.createGame(authData.authToken(), "game"));
-        assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, gameID));
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
+        assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 
     @Test
@@ -69,7 +67,7 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, 1));
+        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
     }
 
     @Test
@@ -79,8 +77,8 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        int gameID = assertDoesNotThrow(()-> gameService.createGame(authData.authToken(), "game"));
-        assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, gameID));
-        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), ChessGame.TeamColor.WHITE, gameID));
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
+        assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 }
