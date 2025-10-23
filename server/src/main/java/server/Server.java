@@ -3,6 +3,7 @@ package server;
 import Service.AdminService;
 import Service.GameService;
 import Service.UserService;
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
@@ -13,7 +14,9 @@ import io.javalin.http.Context;
 import model.*;
 
 import java.awt.desktop.SystemEventListener;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Server {
     private final Javalin server;
@@ -111,8 +114,10 @@ public class Server {
                 return;
             }
             try {
-                ctx.result(new Gson().toJson(gameService.listGames(authToken)));
-                ctx.status(200);
+                List<ListGameResult> games = gameService.listGames(authToken);
+                String str = String.format("{\"games\": %s}", new Gson().toJson(games));
+                System.out.println(str);
+                ctx.status(200).json(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (DataAccessException e) {
@@ -160,11 +165,17 @@ public class Server {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
                 return;
             }
+
             JoinGameData joinGameData;
             try {
                 joinGameData = new Gson().fromJson(ctx.body(), JoinGameData.class);
             } catch (Exception e) {
                 ctx.status(400).json("{\"message\": \"Error: bad request\"}");
+                return;
+            }
+            if (joinGameData.gameID() == 0 || joinGameData.playerColor() != ChessGame.TeamColor.WHITE && joinGameData.playerColor() != ChessGame.TeamColor.BLACK) {
+                String str = String.format("{\"message\": \"Error: bad request\"}");
+                ctx.status(400).json(str);
                 return;
             }
             try {
@@ -175,6 +186,9 @@ public class Server {
                 ctx.status(500).json(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
+            } catch (AlreadyTakenException e) {
+                ;
+                ctx.status(403).json("{\"message\": \"Error: already taken\"}");
             }
         }
 

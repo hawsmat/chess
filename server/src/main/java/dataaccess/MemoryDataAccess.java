@@ -45,7 +45,7 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public int addGame(String gameName) throws DataAccessException {
-        gameIDs.put(gameID, new GameData(gameID, "", "", gameName, new ChessGame()));
+        gameIDs.put(gameID, new GameData(gameID, null, null, gameName, new ChessGame()));
         gameID++;
         return gameID-1;
     }
