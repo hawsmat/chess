@@ -9,12 +9,9 @@ public class AdminService {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    public void clear(String authToken) throws DataAccessException {
-        if (memoryDataAccess.isAuthorized(authToken)) {
+    public void clear() throws DataAccessException {
             memoryDataAccess.clearUserData();
             memoryDataAccess.clearGameData();
             memoryDataAccess.clearUserData();
-        }
-        throw new DataAccessException("not authorized");
     }
 }

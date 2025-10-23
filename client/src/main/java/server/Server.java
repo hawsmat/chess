@@ -1,5 +1,7 @@
 package server;
 
+import Service.AdminService;
+import Service.GameService;
 import Service.UserService;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
@@ -18,10 +20,12 @@ public class Server {
     public Server() {
         memoryDataAccess = new MemoryDataAccess();
         userService = new UserService(memoryDataAccess);
+        Service.AdminService adminService = new AdminService(memoryDataAccess);
+        Service.GameService gameService = new GameService(memoryDataAccess);
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        server.delete("/db", ctx -> {memoryDataAccess.clear(); ctx.status(200); ctx.result("{}");});
+        server.delete("/db", ctx -> {adminService.clear(); ctx.status(200); ctx.result("{}");});
         server.post("user", ctx -> register(ctx));
 
 

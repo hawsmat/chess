@@ -1,10 +1,9 @@
 package Service;
 
-import chess.ChessBoard;
+
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
-import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -12,11 +11,12 @@ import java.util.List;
 
 public class GameService {
     private MemoryDataAccess memoryDataAccess;
+
     public GameService(MemoryDataAccess memoryDataAccess) {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    private List<GameData> listGames(String authToken) throws DataAccessException{
+    public List<GameData> listGames(String authToken) throws DataAccessException{
         List<GameData> gameData = new ArrayList<>();
         if (memoryDataAccess.isAuthorized(authToken)) {
             for (int gameID: memoryDataAccess.getGames()) {
@@ -27,14 +27,14 @@ public class GameService {
         throw new DataAccessException("not authorzied");
     }
 
-    private int createGame(String authToken, String gameName) throws DataAccessException {
+    public int createGame(String authToken, String gameName) throws DataAccessException {
         if (memoryDataAccess.isAuthorized(authToken)) {
             return memoryDataAccess.addGame(gameName);
         }
         throw new DataAccessException("not authorized");
     }
 
-    private void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
         if (memoryDataAccess.isAuthorized(authToken)) {
             if (memoryDataAccess.getGame(gameID) != null) {
                 if (playerColor == ChessGame.TeamColor.WHITE){

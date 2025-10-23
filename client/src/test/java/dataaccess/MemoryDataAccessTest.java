@@ -13,7 +13,7 @@ class MemoryDataAccessTest {
         MemoryDataAccess da = new MemoryDataAccess();
         da.createUser(user);
         assertNotNull(da.getUser(user.username()));
-        da.clear();
+        da.clearUserData();
         assertNull(da.getUser(user.username()));
     }
 
