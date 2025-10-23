@@ -139,7 +139,8 @@ public class ChessPiece {
     }
 
     public List<ChessMove> pawnCapture(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board, List<ChessMove> moves){
-        if (newPosition.getColumn() > 0 && newPosition.getColumn() < 9 && newPosition.getRow() > 0 && newPosition.getRow() < 9 && board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != pieceColor) {
+        if (newPosition.getColumn() > 0 && newPosition.getColumn() < 9 &&
+                newPosition.getRow() > 0 && newPosition.getRow() < 9 && board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != pieceColor) {
             moves.add(new ChessMove(myPosition, newPosition, type));
         }
         return moves;
@@ -152,7 +153,8 @@ public class ChessPiece {
         return moves;
     }
 
-    public List<ChessMove> pawnUpTwo(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board, int direction, List<ChessMove> moves){
+    public List<ChessMove> pawnUpTwo(ChessPosition myPosition, ChessPosition newPosition,
+                                     PieceType type, ChessBoard board, int direction, List<ChessMove> moves){
         if (pawnIsValid(board, newPosition) && pawnIsValid(board, new ChessPosition(newPosition.getRow()-direction, newPosition.getColumn()))) {
             moves.add(new ChessMove(myPosition, newPosition, type));
         }
@@ -160,7 +162,8 @@ public class ChessPiece {
     }
 
     public boolean pawnIsValid(ChessBoard board, ChessPosition newPosition) {
-        return (newPosition.getRow() < 9 && newPosition.getRow() > 0 && newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && board.getPiece(newPosition) == null);
+        return (newPosition.getRow() < 9 && newPosition.getRow() > 0 &&
+                newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && board.getPiece(newPosition) == null);
     }
 
     public List<ChessMove> calculateKing(ChessPosition myPosition, ChessBoard board, List<ChessMove> moves){
@@ -175,9 +178,11 @@ public class ChessPiece {
                 Arrays.asList(1, 1)
         );
         for (int i = 0; i < rowsAndCols.size(); i++){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1));
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0),
+                    myPosition.getColumn() + rowsAndCols.get(i).get(1));
             if (isValid(board, newPosition)) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
+                    moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0),
+                            myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
             }
         }
         return moves;
@@ -195,16 +200,19 @@ public class ChessPiece {
                 Arrays.asList(-1, -2)
         );
         for (int i = 0; i < rowsAndCols.size(); i++){
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1));
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0),
+                    myPosition.getColumn() + rowsAndCols.get(i).get(1));
             if (isValid(board, newPosition)) {
-                moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
+                moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0),
+                        myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
             }
         }
         return moves;
     }
 
     public boolean isValid(ChessBoard board, ChessPosition newPosition) {
-        return (newPosition.getRow() < 9 && newPosition.getRow() > 0 && newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor));
+        return (newPosition.getRow() < 9 && newPosition.getRow() > 0 &&
+                newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != pieceColor));
     }
 
     @Override

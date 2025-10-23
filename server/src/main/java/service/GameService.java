@@ -24,7 +24,8 @@ public class GameService {
         List<ListGameResult> gameData = new ArrayList<>();
         if (memoryDataAccess.isAuthorized(authToken)) {
             for (int gameID : memoryDataAccess.getGames()) {
-                ListGameResult listGameResult = new ListGameResult(memoryDataAccess.getGame(gameID).GameID(), memoryDataAccess.getGame(gameID).whiteUsername(), memoryDataAccess.getGame(gameID).blackUsername(), memoryDataAccess.getGame(gameID).gameName());
+                ListGameResult listGameResult = new ListGameResult(memoryDataAccess.getGame(gameID).gameID(),
+                        memoryDataAccess.getGame(gameID).whiteUsername(), memoryDataAccess.getGame(gameID).blackUsername(), memoryDataAccess.getGame(gameID).gameName());
                 gameData.add(listGameResult);
             }
             return gameData;
@@ -44,7 +45,8 @@ public class GameService {
             if (memoryDataAccess.getGame(joinGameData.gameID()) != null) {
                 if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
                     if (memoryDataAccess.getWhiteUsername(joinGameData.gameID()) == null) {
-                        memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(), memoryDataAccess.getAuthData(authToken).username());
+                        memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
+                                memoryDataAccess.getAuthData(authToken).username());
                     }
                     else {
                         throw new AlreadyTakenException("color already taken");
@@ -52,7 +54,8 @@ public class GameService {
                 }
                 else {
                     if (memoryDataAccess.getBlackUsername(joinGameData.gameID()) == null) {
-                        memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(), memoryDataAccess.getAuthData(authToken).username());
+                        memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
+                                memoryDataAccess.getAuthData(authToken).username());
                     }
                     else {
                         throw new AlreadyTakenException("color already taken");

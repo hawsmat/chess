@@ -21,8 +21,8 @@ public interface DataAccess {
     Set<Integer> getGames() throws DataAccessException;
     void updateGame(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException;
     String getWhiteUsername(int gameID) throws DataAccessException;
-    String getBlackUsername(int GameID) throws DataAccessException;
-    String getGameName(int GameID) throws DataAccessException;
+    String getBlackUsername(int gameID) throws DataAccessException;
+    String getGameName(int gameID) throws DataAccessException;
     ChessGame getChessGame(int gameID) throws DataAccessException;
     void clearGameData() throws DataAccessException;
     boolean isAuthorized(String authToken) throws DataAccessException;

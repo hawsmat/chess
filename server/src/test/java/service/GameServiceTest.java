@@ -84,6 +84,7 @@ class GameServiceTest {
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
         assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
-        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(authData.authToken(),
+                new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 }

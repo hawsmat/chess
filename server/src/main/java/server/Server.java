@@ -171,7 +171,8 @@ public class Server {
                 ctx.status(400).json("{\"message\": \"Error: bad request\"}");
                 return;
             }
-            if (joinGameData.gameID() == 0 || joinGameData.playerColor() != ChessGame.TeamColor.WHITE && joinGameData.playerColor() != ChessGame.TeamColor.BLACK) {
+            if (joinGameData.gameID() == 0 || joinGameData.playerColor() != ChessGame.TeamColor.WHITE &&
+                    joinGameData.playerColor() != ChessGame.TeamColor.BLACK) {
                 String str = String.format("{\"message\": \"Error: bad request\"}");
                 ctx.status(400).json(str);
                 return;
