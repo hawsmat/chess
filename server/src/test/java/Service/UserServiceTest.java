@@ -5,12 +5,10 @@ import dataaccess.MemoryDataAccess;
 import model.AuthData;
 import model.LoginData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.crypto.Data;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserServiceTest {
 

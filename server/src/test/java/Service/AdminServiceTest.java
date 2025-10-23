@@ -3,10 +3,6 @@ package Service;
 import dataaccess.MemoryDataAccess;
 import org.junit.jupiter.api.Test;
 
-import java.security.Provider;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 class AdminServiceTest {
 
     @Test

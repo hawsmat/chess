@@ -8,9 +8,10 @@ import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
-import model.*;
-import io.javalin.*;
+import io.javalin.Javalin;
 import io.javalin.http.Context;
+import model.*;
+
 import java.util.Map;
 
 public class Server {

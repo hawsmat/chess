@@ -1,12 +1,18 @@
 package Service;
 
 import chess.ChessGame;
+import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
-import model.*;
+import dataaccess.UnauthorizedException;
+import model.AuthData;
+import model.CreateGameData;
+import model.JoinGameData;
+import model.UserData;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GameServiceTest {
 
@@ -25,7 +31,7 @@ class GameServiceTest {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
-        assertThrows(DataAccessException.class, ()-> gameService.createGame(new CreateGameData("a", "game")));
+        assertThrows(UnauthorizedException.class, ()-> gameService.createGame(new CreateGameData("a", "game")));
     }
 
     @Test
@@ -67,7 +73,7 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
+        assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
     }
 
     @Test
@@ -79,6 +85,6 @@ class GameServiceTest {
         AuthData authData = assertDoesNotThrow(() -> userService.register(user));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
         assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
-        assertThrows(DataAccessException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 }
