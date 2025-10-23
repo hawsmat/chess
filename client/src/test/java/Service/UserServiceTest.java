@@ -75,8 +75,6 @@ class UserServiceTest {
     void logoutFailureWrongAuthToken() {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
-        UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
         assertThrows(DataAccessException.class, () -> userService.logout("a"));
     }
 

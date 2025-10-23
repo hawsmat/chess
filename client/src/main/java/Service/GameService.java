@@ -42,6 +42,7 @@ public class GameService {
                         memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
                     }
                 }
+
                 else {
                     if (memoryDataAccess.getBlackUsername(gameID).isEmpty()) {
                         memoryDataAccess.updateGame(gameID, playerColor, memoryDataAccess.getAuthData(authToken).username());
