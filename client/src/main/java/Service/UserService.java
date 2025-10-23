@@ -15,27 +15,38 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws AlreadyTakenException, DataAccessException {
-        if (memoryDataAccess.getUser(user.username()) == null) {
-            memoryDataAccess.createUser(user);
-            return memoryDataAccess.createAuthData(user.username());
-        }
-        else {
-            throw new AlreadyTakenException("username already exists");
+        try {
+            if (memoryDataAccess.getUser(user.username()) == null) {
+                memoryDataAccess.createUser(user);
+                return memoryDataAccess.createAuthData(user.username());
+            } else {
+                throw new AlreadyTakenException("username already exists");
+            }
+        } catch (DataAccessException e) {
+            throw e;
         }
     }
     public AuthData login(LoginData loginData) throws UnauthorizedException, DataAccessException {
-        if (memoryDataAccess.getUser(loginData.username()) == null) {
-            throw new DataAccessException("username does not exist");
+        try {
+            if (memoryDataAccess.getUser(loginData.username()) == null) {
+                throw new UnauthorizedException("username does not exist");
+            }
+            if (!loginData.password().equals(memoryDataAccess.getUser(loginData.username()).password())) {
+                throw new UnauthorizedException("incorrect password");
+            }
+            return memoryDataAccess.createAuthData(loginData.username());
+        } catch (DataAccessException e) {
+            throw e;
         }
-        if (!loginData.password().equals(memoryDataAccess.getUser(loginData.username()).password())) {
-            throw new UnauthorizedException("incorrect password");
-        }
-        return memoryDataAccess.createAuthData(loginData.username());
     }
 
     public void logout(String authToken) throws UnauthorizedException, DataAccessException {
-        if (!memoryDataAccess.isAuthorized(authToken)) {
-            throw new UnauthorizedException("incorrect authToken");
+        try {
+            if (!memoryDataAccess.isAuthorized(authToken)) {
+                throw new UnauthorizedException("incorrect authToken");
+            }
+        } catch (DataAccessException e) {
+            throw e;
         }
         memoryDataAccess.deleteAuthData(authToken);
     }

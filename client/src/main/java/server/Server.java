@@ -4,15 +4,18 @@ import Service.AdminService;
 import Service.GameService;
 import Service.UserService;
 import com.google.gson.Gson;
+import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
 import model.AuthData;
+import model.LoginData;
 import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
 
 import javax.xml.crypto.Data;
+import java.lang.instrument.UnmodifiableClassException;
 import java.util.Map;
 
 public class Server {
@@ -50,12 +53,25 @@ public class Server {
         try {
             var res = userService.register(req);
             ctx.result(serializer.toJson(res));
+            ctx.status(200);
         } catch (DataAccessException e) {
-            ctx.status(403);
+            ctx.status(500);
+        } catch (AlreadyTakenException e) {
+            ctx.status(403).json(Map.of("Message", "Error: " + e.getMessage()));
         }
     }
 
     private void login(Context ctx) {
+        LoginData loginData = new Gson().fromJson(ctx.body(), LoginData.class);
+        try {
+            AuthData authData = userService.login(loginData);
+            ctx.result(new Gson().toJson(authData));
+            ctx.status(200);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(Map.of("message", "Error: unauthorzied"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        }
     }
 
     private void logout(Context ctx) {
@@ -77,18 +93,22 @@ public class Server {
         String authToken = ctx.header("authorization");
         try {
             ctx.json(gameService.listGames(authToken));
+            ctx.status(200);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
-            ctx.status(401);
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
-
     }
 
     private void createGame(Context ctx) {
         String authToken = ctx.header("authorization");
         try {
             ctx.json(gameService.listGames(authToken).toString());
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
-            ctx.status(401);
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 
@@ -97,13 +117,19 @@ public class Server {
         try {
             ctx.json(gameService.listGames(authToken).toString());
         } catch (DataAccessException e) {
-            ctx.status(401);
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(Map.of("message: ", "Error: unauthorized"));
         }
     }
 
     private void clear(Context ctx) {
-        adminService.clear();
-        ctx.status(200);
+        try {
+            adminService.clear();
+            ctx.status(200);
+        } catch (DataAccessException e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        }
     }
 
     public int run(int desiredPort) {

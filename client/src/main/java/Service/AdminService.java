@@ -10,8 +10,12 @@ public class AdminService {
     }
 
     public void clear() throws DataAccessException {
+        try {
             memoryDataAccess.clearUserData();
             memoryDataAccess.clearGameData();
             memoryDataAccess.clearUserData();
+        } catch (DataAccessException e) {
+            throw e;
+        }
     }
 }
