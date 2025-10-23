@@ -9,7 +9,7 @@ public class AdminService {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
             memoryDataAccess.clearUserData();
             memoryDataAccess.clearGameData();
             memoryDataAccess.clearUserData();

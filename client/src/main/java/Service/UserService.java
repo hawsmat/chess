@@ -14,7 +14,7 @@ public class UserService {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    public AuthData register(UserData user) throws AlreadyTakenException {
+    public AuthData register(UserData user) throws AlreadyTakenException, DataAccessException {
         if (memoryDataAccess.getUser(user.username()) == null) {
             memoryDataAccess.createUser(user);
             return memoryDataAccess.createAuthData(user.username());
@@ -33,7 +33,7 @@ public class UserService {
         return memoryDataAccess.createAuthData(loginData.username());
     }
 
-    public void logout(String authToken) throws UnauthorizedException {
+    public void logout(String authToken) throws UnauthorizedException, DataAccessException {
         if (!memoryDataAccess.isAuthorized(authToken)) {
             throw new UnauthorizedException("incorrect authToken");
         }

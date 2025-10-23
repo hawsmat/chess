@@ -18,7 +18,7 @@ public class GameService {
         this.memoryDataAccess = memoryDataAccess;
     }
 
-    public List<GameData> listGames(String authToken) throws UnauthorizedException{
+    public List<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         List<GameData> gameData = new ArrayList<>();
         if (memoryDataAccess.isAuthorized(authToken)) {
             for (int gameID: memoryDataAccess.getGames()) {
@@ -29,7 +29,7 @@ public class GameService {
         throw new UnauthorizedException("not authorzied");
     }
 
-    public int createGame(String authToken, String gameName) throws UnauthorizedException {
+    public int createGame(String authToken, String gameName) throws UnauthorizedException, DataAccessException {
         if (memoryDataAccess.isAuthorized(authToken)) {
             return memoryDataAccess.addGame(gameName);
         }
