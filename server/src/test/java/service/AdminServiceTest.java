@@ -1,4 +1,4 @@
-package Service;
+package service;
 
 import dataaccess.MemoryDataAccess;
 import org.junit.jupiter.api.Test;

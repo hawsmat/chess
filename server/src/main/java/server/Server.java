@@ -1,8 +1,8 @@
 package server;
 
-import Service.AdminService;
-import Service.GameService;
-import Service.UserService;
+import service.AdminService;
+import service.GameService;
+import service.UserService;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.AlreadyTakenException;
@@ -13,10 +13,8 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import model.*;
 
-import java.awt.desktop.SystemEventListener;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class Server {
     private final Javalin server;

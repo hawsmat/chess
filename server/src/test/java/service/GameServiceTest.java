@@ -1,8 +1,7 @@
-package Service;
+package service;
 
 import chess.ChessGame;
 import dataaccess.AlreadyTakenException;
-import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
 import model.AuthData;

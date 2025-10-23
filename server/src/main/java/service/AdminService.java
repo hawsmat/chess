@@ -1,4 +1,4 @@
-package Service;
+package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;

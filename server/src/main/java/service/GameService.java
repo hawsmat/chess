@@ -1,4 +1,4 @@
-package Service;
+package service;
 
 
 import chess.ChessGame;
@@ -7,7 +7,6 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
 import model.CreateGameData;
-import model.GameData;
 import model.JoinGameData;
 import model.ListGameResult;
 

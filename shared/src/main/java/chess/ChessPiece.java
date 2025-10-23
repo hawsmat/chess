@@ -12,10 +12,6 @@ public class ChessPiece {
     final private ChessGame.TeamColor pieceColor;
     final private ChessPiece.PieceType type;
 
-//  moves is used in a bunch of
-    final private List<ChessMove> moves = new ArrayList<>();
-
-
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
@@ -55,53 +51,47 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        List<ChessMove> moves = new ArrayList<>();
         if (board.getPiece(myPosition).getPieceType() == PieceType.BISHOP) {
-            calculateDiagonalAndSides(myPosition, board, 1, 1);
-            calculateDiagonalAndSides(myPosition, board, 1, -1);
-            calculateDiagonalAndSides(myPosition, board, -1, 1);
-            calculateDiagonalAndSides(myPosition, board, -1, -1);
-            return moves;
+            moves = calculateDiagonalAndSides(myPosition, board, 1, 1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, 1, -1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, -1, 1, moves);
+            return calculateDiagonalAndSides(myPosition, board, -1, -1, moves);
         }
         else if (board.getPiece(myPosition).getPieceType() == PieceType.KING) {
-            calculateKing(myPosition, board);
-            return moves;
+            return calculateKing(myPosition, board, moves);
         }
         else if (board.getPiece(myPosition).getPieceType() == PieceType.KNIGHT) {
-            calculateKnight(myPosition, board);
-            return moves;
+            return calculateKnight(myPosition, board, moves);
         }
         else if (board.getPiece(myPosition).getPieceType() == PieceType.PAWN) {
             if (pieceColor == ChessGame.TeamColor.WHITE) {
-                calculatePawn(myPosition, board, 1, 2);
-                return moves;
+                return calculatePawn(myPosition, board, 1, 2, moves);
             }
             else {
-                calculatePawn(myPosition, board, -1, 7);
-                return moves;
+                return calculatePawn(myPosition, board, -1, 7, moves);
             }
         }
         else if (board.getPiece(myPosition).getPieceType() == PieceType.ROOK) {
-            calculateDiagonalAndSides(myPosition, board, 0, 1);
-            calculateDiagonalAndSides(myPosition, board, 0, -1);
-            calculateDiagonalAndSides(myPosition, board, 1, 0);
-            calculateDiagonalAndSides(myPosition, board, -1, 0);
-            return moves;
+            moves = calculateDiagonalAndSides(myPosition, board, 0, 1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, 0, -1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, 1, 0, moves);
+            return calculateDiagonalAndSides(myPosition, board, -1, 0, moves);
         }
         else if (board.getPiece(myPosition).getPieceType() == PieceType.QUEEN) {
-            calculateDiagonalAndSides(myPosition, board, 1, 1);
-            calculateDiagonalAndSides(myPosition, board, 1, -1);
-            calculateDiagonalAndSides(myPosition, board, -1, 1);
-            calculateDiagonalAndSides(myPosition, board, -1, -1);
-            calculateDiagonalAndSides(myPosition, board, 0, 1);
-            calculateDiagonalAndSides(myPosition, board, 0, -1);
-            calculateDiagonalAndSides(myPosition, board, 1, 0);
-            calculateDiagonalAndSides(myPosition, board, -1, 0);
-            return moves;
+            moves = calculateDiagonalAndSides(myPosition, board, 1, 1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, 1, -1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, -1, 1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, -1, -1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, 0, 1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, 0, -1, moves);
+            moves = calculateDiagonalAndSides(myPosition, board, 1, 0, moves);
+            return calculateDiagonalAndSides(myPosition, board, -1, 0, moves);
         }
         return List.of();
     }
 
-    public void calculateDiagonalAndSides(ChessPosition myPosition, ChessBoard board, int row, int col) {
+    public List<ChessMove> calculateDiagonalAndSides(ChessPosition myPosition, ChessBoard board, int row, int col, List<ChessMove> moves) {
         for (int i = 1; i < 8; i++) {
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() + i*row, myPosition.getColumn() + i*col);
             if (isValid(board, newPosition)) {
@@ -117,9 +107,10 @@ public class ChessPiece {
                 break;
             }
         }
+        return moves;
     }
 
-    public void calculatePawn(ChessPosition myPosition, ChessBoard board, int direction, int startPos) {
+    public List<ChessMove> calculatePawn(ChessPosition myPosition, ChessBoard board, int direction, int startPos, List<ChessMove> moves) {
         int x = myPosition.getRow() + direction;
         int y = myPosition.getColumn();
         ChessPosition newPosition = new ChessPosition(x, y);
@@ -131,44 +122,48 @@ public class ChessPiece {
         );
         if (x + direction > 8 || x + direction < 1) {
             for (PieceType promotion: pieces) {
-                pawnCapture(myPosition, new ChessPosition(x, y+1), promotion, board);
-                pawnCapture(myPosition, new ChessPosition(x, y-1),promotion, board);
-                pawnUp(myPosition, new ChessPosition(x, y), promotion, board);
+                pawnCapture(myPosition, new ChessPosition(x, y+1), promotion, board, moves);
+                pawnCapture(myPosition, new ChessPosition(x, y-1),promotion, board, moves);
+                pawnUp(myPosition, new ChessPosition(x, y), promotion, board, moves);
             }
         }
         else {
-            pawnCapture(myPosition, new ChessPosition(x, y+1), null, board);
-            pawnCapture(myPosition, new ChessPosition(x, y-1),null, board);
-            pawnUp(myPosition, newPosition, null, board);
+            pawnCapture(myPosition, new ChessPosition(x, y+1), null, board, moves);
+            pawnCapture(myPosition, new ChessPosition(x, y-1),null, board, moves);
+            pawnUp(myPosition, newPosition, null, board, moves);
             if (x-direction == startPos) {
-                pawnUpTwo(myPosition, new ChessPosition(x+direction, y), null, board, direction);
+                pawnUpTwo(myPosition, new ChessPosition(x+direction, y), null, board, direction, moves);
             }
         }
+        return moves;
     }
 
-    public void pawnCapture(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board){
+    public List<ChessMove> pawnCapture(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board, List<ChessMove> moves){
         if (newPosition.getColumn() > 0 && newPosition.getColumn() < 9 && newPosition.getRow() > 0 && newPosition.getRow() < 9 && board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != pieceColor) {
             moves.add(new ChessMove(myPosition, newPosition, type));
         }
+        return moves;
     }
 
-    public void pawnUp(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board){
+    public List<ChessMove> pawnUp(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board, List<ChessMove> moves){
         if (pawnIsValid(board, newPosition)) {
             moves.add(new ChessMove(myPosition, newPosition, type));
         }
+        return moves;
     }
 
-    public void pawnUpTwo(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board, int direction){
+    public List<ChessMove> pawnUpTwo(ChessPosition myPosition, ChessPosition newPosition, PieceType type, ChessBoard board, int direction, List<ChessMove> moves){
         if (pawnIsValid(board, newPosition) && pawnIsValid(board, new ChessPosition(newPosition.getRow()-direction, newPosition.getColumn()))) {
             moves.add(new ChessMove(myPosition, newPosition, type));
         }
+        return moves;
     }
 
     public boolean pawnIsValid(ChessBoard board, ChessPosition newPosition) {
         return (newPosition.getRow() < 9 && newPosition.getRow() > 0 && newPosition.getColumn() < 9 && newPosition.getColumn() > 0 && board.getPiece(newPosition) == null);
     }
 
-    public void calculateKing(ChessPosition myPosition, ChessBoard board){
+    public List<ChessMove> calculateKing(ChessPosition myPosition, ChessBoard board, List<ChessMove> moves){
         List<List<Integer>> rowsAndCols = Arrays.asList(
                 Arrays.asList(-1, -1),
                 Arrays.asList(-1, 0),
@@ -185,9 +180,10 @@ public class ChessPiece {
                     moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
             }
         }
+        return moves;
     }
 
-    public void calculateKnight(ChessPosition myPosition, ChessBoard board){
+    public List<ChessMove> calculateKnight(ChessPosition myPosition, ChessBoard board, List<ChessMove> moves){
         List<List<Integer>> rowsAndCols = Arrays.asList(
                 Arrays.asList(-2, -1),
                 Arrays.asList(-2, 1),
@@ -204,6 +200,7 @@ public class ChessPiece {
                 moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + rowsAndCols.get(i).get(0), myPosition.getColumn() + rowsAndCols.get(i).get(1)), null));
             }
         }
+        return moves;
     }
 
     public boolean isValid(ChessBoard board, ChessPosition newPosition) {
@@ -221,6 +218,6 @@ public class ChessPiece {
 
     @Override
     public int hashCode() {
-        return Objects.hash(pieceColor, type, moves);
+        return Objects.hash(pieceColor, type);
     }
 }
