@@ -127,7 +127,20 @@ public class Server {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
                 return;
             }
-            String gameName = ctx.body();
+            String gameName;
+            try {
+                var map = new Gson().fromJson(ctx.body(), Map.class);
+                gameName = (String) map.get("gameName");
+            } catch (Exception e) {
+                String str = String.format("{\"message\": \"Error: bad request\"}", e);
+                ctx.status(400).json(str);
+                return;
+            }
+            if (gameName == null || gameName.isEmpty()) {
+                String str = String.format("{\"message\": \"Error: bad request\"}");
+                ctx.status(400).json(str);
+                return;
+            }
             CreateGameData createGameData = new CreateGameData(authToken, gameName);
             try {
                 int gameID = gameService.createGame(createGameData);
