@@ -25,7 +25,9 @@ public class GameService {
         if (memoryDataAccess.isAuthorized(authToken)) {
             for (int gameID : memoryDataAccess.getGames()) {
                 ListGameResult listGameResult = new ListGameResult(memoryDataAccess.getGame(gameID).gameID(),
-                        memoryDataAccess.getGame(gameID).whiteUsername(), memoryDataAccess.getGame(gameID).blackUsername(), memoryDataAccess.getGame(gameID).gameName());
+                        memoryDataAccess.getGame(gameID).whiteUsername(),
+                        memoryDataAccess.getGame(gameID).blackUsername(),
+                        memoryDataAccess.getGame(gameID).gameName());
                 gameData.add(listGameResult);
             }
             return gameData;
