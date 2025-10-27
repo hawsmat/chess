@@ -7,6 +7,7 @@ import dataaccess.UnauthorizedException;
 import model.AuthData;
 import model.LoginData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 
@@ -18,17 +19,19 @@ public class UserService {
 
     public AuthData register(UserData user) throws AlreadyTakenException, DataAccessException {
         if (memoryDataAccess.getUser(user.username()) == null) {
-            memoryDataAccess.createUser(user);
-            return memoryDataAccess.createAuthData(user.username());
+            UserData newUser = new UserData(user.username(),BCrypt.hashpw(user.password(), BCrypt.gensalt()), user.email());
+            memoryDataAccess.createUser(newUser);
+            return memoryDataAccess.createAuthData(newUser.username());
         } else {
             throw new AlreadyTakenException("username already exists");
         }
     }
+
     public AuthData login(LoginData loginData) throws UnauthorizedException, DataAccessException {
         if (memoryDataAccess.getUser(loginData.username()) == null) {
             throw new UnauthorizedException("username does not exist");
         }
-        if (!loginData.password().equals(memoryDataAccess.getUser(loginData.username()).password())) {
+        if (!BCrypt.checkpw(loginData.password(), memoryDataAccess.getUser(loginData.username()).password())) {
             throw new UnauthorizedException("incorrect password");
         }
         return memoryDataAccess.createAuthData(loginData.username());
