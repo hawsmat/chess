@@ -16,6 +16,7 @@ public class MySqlDataAccess implements DataAccess{
     public MySqlDataAccess() throws DataAccessException{
         configureDatabase();
     }
+
     @Override
     public void clearUserData() throws DataAccessException {
 
@@ -23,7 +24,8 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-
+        try {
+        }
     }
 
     @Override
@@ -103,15 +105,25 @@ public class MySqlDataAccess implements DataAccess{
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  game (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `name` varchar(256) NOT NULL,
-              `type` ENUM('CAT', 'DOG', 'FISH', 'FROG', 'ROCK') DEFAULT 'CAT',
-              `json` TEXT DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              INDEX(type),
-              INDEX(name)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            CREATE TABLE IF NOT EXISTS gameData (
+            gameID INT NOT NULL AUTO_INCREMENT,
+            whiteUsername VARCHARR(255) DEFAULT NULL,
+            blackUSername VARCHARR(255) DEFAULT NULL,
+            gameName VARCHARR(255) DEFAULT NULL,
+            game longtext NOTNULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS authData (
+            username VARCHARR(255) DEFAULT NULL,
+            password VARCHARR(255) DEFAULT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS authTokens(
+            authToken VARCHARR(255) DEFAULT NULL,
+            username VARCHARR(255) DEFAULT NULL
+            )
             """
     };
 
@@ -125,7 +137,6 @@ public class MySqlDataAccess implements DataAccess{
             }
         } catch (DataAccessException | SQLException ex) {
             System.out.println(ex.getMessage());
-
         }
     }
 }
