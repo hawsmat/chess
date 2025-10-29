@@ -1,14 +1,11 @@
 package server;
 
+import dataaccess.*;
 import service.AdminService;
 import service.GameService;
 import service.UserService;
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
-import dataaccess.UnauthorizedException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import model.*;
@@ -21,13 +18,17 @@ public class Server {
     private UserService userService;
     private GameService gameService;
     private AdminService adminService;
-    private MemoryDataAccess memoryDataAccess;
+    private DataAccess dataAccess;
 
     public Server() {
-        memoryDataAccess = new MemoryDataAccess();
-        userService = new UserService(memoryDataAccess);
-        gameService = new GameService(memoryDataAccess);
-        adminService = new AdminService(memoryDataAccess);
+        try {
+            dataAccess = new MySqlDataAccess();
+        } catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
+        userService = new UserService(dataAccess);
+        gameService = new GameService(dataAccess);
+        adminService = new AdminService(dataAccess);
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -114,7 +115,6 @@ public class Server {
             try {
                 List<ListGameResult> games = gameService.listGames(authToken);
                 String str = String.format("{\"games\": %s}", new Gson().toJson(games));
-                System.out.println(str);
                 ctx.status(200).json(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");

@@ -12,8 +12,8 @@ import static java.sql.Types.NULL;
 import java.util.Set;
 
 
-public class MySqlDataAccess implements DataAccess{
-    public MySqlDataAccess() throws DataAccessException{
+public class MySqlDataAccess implements DataAccess {
+    public MySqlDataAccess() throws DataAccessException {
         configureDatabase();
     }
 
@@ -24,8 +24,6 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        try {
-        }
     }
 
     @Override

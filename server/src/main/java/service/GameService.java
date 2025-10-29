@@ -2,10 +2,7 @@ package service;
 
 
 import chess.ChessGame;
-import dataaccess.AlreadyTakenException;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
-import dataaccess.UnauthorizedException;
+import dataaccess.*;
 import model.CreateGameData;
 import model.JoinGameData;
 import model.ListGameResult;
@@ -14,20 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameService {
-    private MemoryDataAccess memoryDataAccess;
+    private DataAccess dataAccess;
 
-    public GameService(MemoryDataAccess memoryDataAccess) {
-        this.memoryDataAccess = memoryDataAccess;
+    public GameService(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
     }
 
     public List<ListGameResult> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         List<ListGameResult> gameData = new ArrayList<>();
-        if (memoryDataAccess.isAuthorized(authToken)) {
-            for (int gameID : memoryDataAccess.getGames()) {
-                ListGameResult listGameResult = new ListGameResult(memoryDataAccess.getGame(gameID).gameID(),
-                        memoryDataAccess.getGame(gameID).whiteUsername(),
-                        memoryDataAccess.getGame(gameID).blackUsername(),
-                        memoryDataAccess.getGame(gameID).gameName());
+        if (dataAccess.isAuthorized(authToken)) {
+            for (int gameID : dataAccess.getGames()) {
+                ListGameResult listGameResult = new ListGameResult(dataAccess.getGame(gameID).gameID(),
+                        dataAccess.getGame(gameID).whiteUsername(),
+                        dataAccess.getGame(gameID).blackUsername(),
+                        dataAccess.getGame(gameID).gameName());
                 gameData.add(listGameResult);
             }
             return gameData;
@@ -36,28 +33,28 @@ public class GameService {
     }
 
     public int createGame(CreateGameData createGameData) throws UnauthorizedException, DataAccessException {
-        if (memoryDataAccess.isAuthorized(createGameData.authToken())) {
-            return memoryDataAccess.addGame(createGameData.gameName());
+        if (dataAccess.isAuthorized(createGameData.authToken())) {
+            return dataAccess.addGame(createGameData.gameName());
         }
         throw new UnauthorizedException("not authorized");
     }
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException, UnauthorizedException, DataAccessException {
-        if (memoryDataAccess.isAuthorized(authToken)) {
-            if (memoryDataAccess.getGame(joinGameData.gameID()) != null) {
+        if (dataAccess.isAuthorized(authToken)) {
+            if (dataAccess.getGame(joinGameData.gameID()) != null) {
                 if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
-                    if (memoryDataAccess.getWhiteUsername(joinGameData.gameID()) == null) {
-                        memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
-                                memoryDataAccess.getAuthData(authToken).username());
+                    if (dataAccess.getWhiteUsername(joinGameData.gameID()) == null) {
+                        dataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
+                                dataAccess.getAuthData(authToken).username());
                     }
                     else {
                         throw new AlreadyTakenException("color already taken");
                     }
                 }
                 else {
-                    if (memoryDataAccess.getBlackUsername(joinGameData.gameID()) == null) {
-                        memoryDataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
-                                memoryDataAccess.getAuthData(authToken).username());
+                    if (dataAccess.getBlackUsername(joinGameData.gameID()) == null) {
+                        dataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
+                                dataAccess.getAuthData(authToken).username());
                     }
                     else {
                         throw new AlreadyTakenException("color already taken");
