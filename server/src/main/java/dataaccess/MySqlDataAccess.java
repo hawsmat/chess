@@ -26,9 +26,9 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        String statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
+        String statement = "INSERT INTO userData (username, password) VALUES (?, ?)";
         String json = new Gson().toJson(user);
-        executeUpdate(statement);
+        executeUpdate(statement, user.username(), user.password(), json);
     }
 
     @Override
@@ -37,8 +37,10 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void addAuthData(AuthData authData) {
-
+    public void addAuthData(AuthData authData) throws DataAccessException {
+        String statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
+        String json = new Gson().toJson(authData);
+        executeUpdate(statement, authData.authToken(), authData.username(), json);
     }
 
     @Override
@@ -60,7 +62,9 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public int addGame(String gameName) throws DataAccessException {
-        return 0;
+        String statement = "INSERT INTO gameData (gameName, game) VALUES (?, ?)";
+        String json = new Gson().toJson(gameName);
+        executeUpdate(statement, gameName, new ChessGame(), json);
     }
 
     @Override
@@ -109,14 +113,14 @@ public class MySqlDataAccess implements DataAccess {
         return false;
     }
 
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+    private int executeUpdate(String statement, Object... params) throws DataAccessException{
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+//                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
@@ -127,7 +131,7 @@ public class MySqlDataAccess implements DataAccess {
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException(DataAccessException.Code.ServerError, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -135,22 +139,23 @@ public class MySqlDataAccess implements DataAccess {
             """
             CREATE TABLE IF NOT EXISTS gameData (
             gameID INT NOT NULL AUTO_INCREMENT,
-            whiteUsername VARCHARR(255) DEFAULT NULL,
-            blackUSername VARCHARR(255) DEFAULT NULL,
-            gameName VARCHARR(255) DEFAULT NULL,
-            game longtext NOTNULL
+            whiteUsername VARCHAR(255) DEFAULT NULL,
+            blackUsername VARCHAR(255) DEFAULT NULL,
+            gameName VARCHAR(255) DEFAULT NULL,
+            game LONGTEXT NOT NULL,
+            PRIMARY KEY (gameID)
             )
             """,
             """
             CREATE TABLE IF NOT EXISTS authData (
-            username VARCHARR(255) DEFAULT NULL,
-            password VARCHARR(255) DEFAULT NULL
+            username VARCHAR(255) DEFAULT NULL,
+            password VARCHAR(255) DEFAULT NULL
             )
             """,
             """
             CREATE TABLE IF NOT EXISTS authTokens(
-            authToken VARCHARR(255) DEFAULT NULL,
-            username VARCHARR(255) DEFAULT NULL
+            authToken VARCHAR(255) DEFAULT NULL,
+            username VARCHAR(255) DEFAULT NULL
             )
             """
     };
