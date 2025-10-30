@@ -19,7 +19,8 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void clearUserData() throws DataAccessException {
-
+        String statement = "TRUNCATE authData";
+        executeUpdate(statement);
     }
 
     @Override
@@ -43,12 +44,14 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void clearAuthData() throws DataAccessException {
-
+        String statement = "TRUNCATE authTokens";
+        executeUpdate(statement);
     }
 
     @Override
     public void deleteAuthData(String username) throws DataAccessException {
-
+        String statement = "DELETE FROM authData WHERE id=?";
+        executeUpdate(statement, username);
     }
 
     @Override
@@ -93,12 +96,35 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void clearGameData() throws DataAccessException {
-
+        String statement = "TRUNCATE gameData";
+        executeUpdate(statement);
     }
 
     @Override
     public boolean isAuthorized(String authToken) throws DataAccessException {
         return false;
+    }
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+                ps.executeUpdate();
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(DataAccessException.Code.ServerError, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     private final String[] createStatements = {
