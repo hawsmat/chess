@@ -7,6 +7,7 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class UserService {
     private DataAccess dataAccess;
@@ -18,7 +19,10 @@ public class UserService {
         if (dataAccess.getUser(user.username()) == null) {
             UserData newUser = new UserData(user.username(),BCrypt.hashpw(user.password(), BCrypt.gensalt()), user.email());
             dataAccess.createUser(newUser);
-            return dataAccess.createAuthData(newUser.username());
+            String authToken = UUID.randomUUID().toString();
+            AuthData authData = new AuthData(authToken, user.username());
+            dataAccess.addAuthData(authData);
+            return authData;
         } else {
             throw new AlreadyTakenException("username already exists");
         }
@@ -31,7 +35,10 @@ public class UserService {
         if (!BCrypt.checkpw(loginData.password(), dataAccess.getUser(loginData.username()).password())) {
             throw new UnauthorizedException("incorrect password");
         }
-        return dataAccess.createAuthData(loginData.username());
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, loginData.username());
+        dataAccess.addAuthData(authData);
+        return authData;
     }
 
     public void logout(String authToken) throws UnauthorizedException, DataAccessException {

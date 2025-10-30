@@ -12,7 +12,7 @@ public interface DataAccess {
     void clearUserData() throws DataAccessException;
     void createUser(UserData user) throws DataAccessException;
     LoginData getUser(String username) throws DataAccessException;
-    AuthData createAuthData(String username) throws DataAccessException;
+    void addAuthData(AuthData authData) throws DataAccessException;
     AuthData getAuthData(String username) throws DataAccessException;
     void clearAuthData() throws DataAccessException;
     void deleteAuthData(String username) throws DataAccessException;

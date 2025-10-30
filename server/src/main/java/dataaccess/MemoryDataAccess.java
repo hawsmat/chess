@@ -27,11 +27,8 @@ public class MemoryDataAccess implements DataAccess {
         return users.get(username);}
 
     @Override
-    public AuthData createAuthData(String username) throws DataAccessException {
-        String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, username);
-        authDatas.put(authToken, authData);
-        return authData;
+    public void addAuthData(AuthData authData) {
+        authDatas.put(authData.authToken(), authData);
     }
 
     @Override

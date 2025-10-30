@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.LoginData;
@@ -25,6 +26,9 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
+        String statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
+        String json = new Gson().toJson(user);
+        executeUpdate(statement);
     }
 
     @Override
@@ -33,8 +37,8 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public AuthData createAuthData(String username) throws DataAccessException {
-        return null;
+    public void addAuthData(AuthData authData) {
+
     }
 
     @Override
