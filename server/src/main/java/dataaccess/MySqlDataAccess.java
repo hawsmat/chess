@@ -33,6 +33,14 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public LoginData getUser(String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT * FROM userData WHERE username?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
@@ -45,6 +53,14 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public AuthData getAuthData(String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT FROM authData WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
@@ -65,15 +81,39 @@ public class MySqlDataAccess implements DataAccess {
         String statement = "INSERT INTO gameData (gameName, game) VALUES (?, ?)";
         String json = new Gson().toJson(gameName);
         executeUpdate(statement, gameName, new ChessGame(), json);
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT FROM gameData WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
     @Override
     public Set<Integer> getGames() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT FROM gameData";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return Set.of();
     }
 
@@ -84,21 +124,53 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public String getWhiteUsername(int gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT whiteUsername FROM gameDATA WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return "";
     }
 
     @Override
     public String getBlackUsername(int gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT blackUsername FROM gameData WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return "";
     }
 
     @Override
     public String getGameName(int gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT gameName FROM gameData WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return "";
     }
 
     @Override
     public ChessGame getChessGame(int gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT chessGame FROM gameData WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)){
+
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
@@ -144,19 +216,19 @@ public class MySqlDataAccess implements DataAccess {
             gameName VARCHAR(255) DEFAULT NULL,
             game LONGTEXT NOT NULL,
             PRIMARY KEY (gameID)
-            )
+            );
             """,
             """
             CREATE TABLE IF NOT EXISTS authData (
             username VARCHAR(255) DEFAULT NULL,
             password VARCHAR(255) DEFAULT NULL
-            )
+            );
             """,
             """
             CREATE TABLE IF NOT EXISTS authTokens(
             authToken VARCHAR(255) DEFAULT NULL,
             username VARCHAR(255) DEFAULT NULL
-            )
+            );
             """
     };
 
