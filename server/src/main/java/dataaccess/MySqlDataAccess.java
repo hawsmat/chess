@@ -64,8 +64,10 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public void addAuthData(AuthData authData) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "INSERT INTO authdata (authtoken, username) VALUES (?, ?)";
+            String statement = "INSERT INTO authtokens (authtoken, username) VALUES (?, ?)";
             PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setString(1, authData.authToken());
+            ps.setString(2, authData.username());
             ps.executeUpdate();
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -102,8 +104,9 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public void deleteAuthData(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "DELETE FROM authdata WHERE id=?";
+            String statement = "DELETE FROM authdata WHERE username=?";
             PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setString(1, username);
             ps.executeUpdate();
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -254,7 +257,7 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public boolean isAuthorized(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT authtoken FROM authtoken";
+            String statement = "SELECT authtoken FROM authtokens";
             PreparedStatement ps = conn.prepareStatement(statement);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {

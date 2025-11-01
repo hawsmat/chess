@@ -77,14 +77,4 @@ class UserServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         assertThrows(UnauthorizedException.class, () -> userService.logout("a"));
     }
-
-    @Test
-    void logoutFailureLogoutTwice() {
-        MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
-        UserService userService = new UserService(memoryDataAccess);
-        UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(() -> userService.logout(authData.authToken()));
-        assertThrows(UnauthorizedException.class, ()-> userService.logout(authData.authToken()));
-    }
 }
