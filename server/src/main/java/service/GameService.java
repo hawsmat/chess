@@ -44,7 +44,7 @@ public class GameService {
             if (dataAccess.getGame(joinGameData.gameID()) != null) {
                 if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
                     if (dataAccess.getWhiteUsername(joinGameData.gameID()) == null) {
-                        dataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
+                        dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
                                 dataAccess.getAuthData(authToken).username());
                     }
                     else {
@@ -53,7 +53,7 @@ public class GameService {
                 }
                 else {
                     if (dataAccess.getBlackUsername(joinGameData.gameID()) == null) {
-                        dataAccess.updateGame(joinGameData.gameID(), joinGameData.playerColor(),
+                        dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
                                 dataAccess.getAuthData(authToken).username());
                     }
                     else {

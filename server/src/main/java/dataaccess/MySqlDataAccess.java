@@ -11,6 +11,7 @@ import java.sql.*;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -62,22 +63,24 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void addAuthData(AuthData authData) throws DataAccessException {
-        String statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
-        String json = new Gson().toJson(authData);
-        executeUpdate(statement, authData.authToken(), authData.username(), json);
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO authData (authToken, username) VALUES (?, ?)";
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.executeQuery();
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public AuthData getAuthData(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT FROM authData WHERE username=?";
-            try (PreparedStatement ps = conn.prepareStatement(statement)){
-                ps.setString(1, username);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-
-                    }
-                }
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new AuthData(rs.getString("authToken"), rs.getString("username"));
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -98,41 +101,45 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void deleteAuthData(String username) throws DataAccessException {
-        String statement = "DELETE FROM authData WHERE id=?";
-        executeUpdate(statement, username);
-    }
-
-    @Override
-    public int addGame(String gameName) throws DataAccessException {
-        String statement = "INSERT INTO gameData (gameName, game) VALUES (?, ?)";
-        String json = new Gson().toJson(gameName);
-        executeUpdate(statement, gameName, new ChessGame(), json);
         try (Connection conn = DatabaseManager.getConnection()) {
-            String newStatement = "SELECT gameID FROM gameData WHERE gameName=?";
-            try (PreparedStatement ps = conn.prepareStatement(newStatement)){
-                ps.setString(1, gameName);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return 0;
-                    }
-                }
-            }
+            String statement = "DELETE FROM authData WHERE id=?";
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.executeQuery();
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
+    public int addGame(String gameName) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO gameData (gameName, game) VALUES (?, ?)";
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setString(1, gameName);
+            String gameData = new Gson().toJson(new ChessGame());
+            ps.setString(2, gameData);
+            ps.executeQuery();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
+        throw new DataAccessException("something is very wrong when adding game");
+    }
+
+    @Override
     public GameData getGame(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT FROM gameData WHERE gameID=?";
-            try (PreparedStatement ps = conn.prepareStatement(statement)){
-                ps.setInt(1, gameID);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-
-                    }
-                }
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setInt(1, gameID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                ChessGame chessGame = new Gson().fromJson(rs.getString("gameData"), ChessGame.class);
+                return new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"), rs.getString("gameName"), chessGame);
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -142,15 +149,13 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public Set<Integer> getGames() throws DataAccessException {
-        Set<Integer> gameIDs = new Set<Integer>() {};
+        Set<Integer> gameIDs = new HashSet<>() {};
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT FROM gameData";
-            try (PreparedStatement ps = conn.prepareStatement(statement)){
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-
-                    }
-                }
+            String statement = "SELECT gameID FROM gameData";
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                gameIDs.add(rs.getInt("gameID"));
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -159,62 +164,64 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException {
-
+    public void updateUsernames(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE gameData SET teamColor=? WHERE gameID=?";
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setString(1, username);
+            ps.setInt(2, gameID);
+            ps.executeQuery();
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public String getWhiteUsername(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT whiteUsername FROM gameDATA WHERE gameID=?";
-            try (PreparedStatement ps = conn.prepareStatement(statement)){
-                ps.setInt(1, gameID);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-
-                    }
-                }
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setInt(1, gameID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("whiteUsername");
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-        return "";
+        throw new DataAccessException("something is very wrong with getWhiteUsername");
     }
 
     @Override
     public String getBlackUsername(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT blackUsername FROM gameData WHERE gameID=?";
-            try (PreparedStatement ps = conn.prepareStatement(statement)){
-                ps.setInt(1, gameID);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-
-                    }
-                }
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setInt(1, gameID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                rs.getString("blackUsername");
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-        return "";
+        throw new DataAccessException("somethign is wrong with getBlackUsername");
     }
 
     @Override
     public String getGameName(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT gameName FROM gameData WHERE gameID=?";
-            try (PreparedStatement ps = conn.prepareStatement(statement)){
-                ps.setInt(1, gameID);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-
-                    }
-                }
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setInt(1, gameID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("gameName");
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-        return "";
+        throw new DataAccessException("somethign is wrong with getGameName");
     }
 
     @Override

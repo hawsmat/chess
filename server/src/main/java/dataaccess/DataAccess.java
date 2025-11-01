@@ -19,7 +19,7 @@ public interface DataAccess {
     int addGame(String gameName) throws DataAccessException;
     GameData getGame(int gameID) throws DataAccessException;
     Set<Integer> getGames() throws DataAccessException;
-    void updateGame(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException;
+    void updateUsernames(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException;
     String getWhiteUsername(int gameID) throws DataAccessException;
     String getBlackUsername(int gameID) throws DataAccessException;
     String getGameName(int gameID) throws DataAccessException;

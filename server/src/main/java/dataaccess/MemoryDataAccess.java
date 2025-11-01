@@ -6,25 +6,27 @@ import model.GameData;
 import model.LoginData;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.UUID;
 
 public class MemoryDataAccess implements DataAccess {
-    private HashMap<String, LoginData> users = new HashMap<>();
-    private HashMap<Integer, GameData> gameIDs = new HashMap<>();
+    private HashMap<String, LoginData> loginDatas = new HashMap<>();
+    private HashMap<Integer, GameData> gameDatas = new HashMap<>();
     int gameID = 1;
     private HashMap<String, AuthData> authDatas = new HashMap<>();
 
     @Override
-    public void clearUserData() throws DataAccessException {users.clear();}
+    public void clearUserData() throws DataAccessException {
+        loginDatas.clear();}
 
     @Override
-    public void createUser(UserData user) throws DataAccessException {users.put(user.username(), new LoginData(user.username(), user.password()));}
+    public void createUser(UserData user) throws DataAccessException {
+        loginDatas.put(user.username(), new LoginData(user.username(), user.password()));}
 
     @Override
     public LoginData getUser(String username) throws DataAccessException {
-        return users.get(username);}
+        return loginDatas.get(username);}
 
     @Override
     public void addAuthData(AuthData authData) {
@@ -42,49 +44,50 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public int addGame(String gameName) throws DataAccessException {
-        gameIDs.put(gameID, new GameData(gameID, null, null, gameName, new ChessGame()));
+        gameDatas.put(gameID, new GameData(gameID, null, null, gameName, new ChessGame()));
         gameID++;
         return gameID-1;
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {return gameIDs.get(gameID);}
+    public GameData getGame(int gameID) throws DataAccessException {return gameDatas.get(gameID);}
 
     @Override
     public Set<Integer> getGames() throws DataAccessException {
-        return gameIDs.keySet();
+        return gameDatas.keySet();
     }
 
     @Override
-    public void updateGame(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException {
+    public void updateUsernames(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException {
         if (teamColor == ChessGame.TeamColor.WHITE) {
-            gameIDs.replace(gameID, new GameData(gameID, username, getBlackUsername(gameID), getGameName(gameID), getChessGame(gameID)));
+            gameDatas.replace(gameID, new GameData(gameID, username, getBlackUsername(gameID), getGameName(gameID), getChessGame(gameID)));
         }
         else {
-            gameIDs.replace(gameID, new GameData(gameID, getWhiteUsername(gameID), username, getGameName(gameID), getChessGame(gameID)));
+            gameDatas.replace(gameID, new GameData(gameID, getWhiteUsername(gameID), username, getGameName(gameID), getChessGame(gameID)));
         }
     }
 
     @Override
     public String getWhiteUsername(int gameID) throws DataAccessException {
-        return gameIDs.get(gameID).whiteUsername();
+        return gameDatas.get(gameID).whiteUsername();
     }
 
     @Override
     public String getBlackUsername(int gameID) throws DataAccessException{
-        return gameIDs.get(gameID).blackUsername();
+        return gameDatas.get(gameID).blackUsername();
     }
 
     @Override
     public String getGameName(int gameID) throws DataAccessException {
-        return gameIDs.get(gameID).gameName();
+        return gameDatas.get(gameID).gameName();
     }
 
     @Override
-    public ChessGame getChessGame(int gameID) throws DataAccessException {return gameIDs.get(gameID).game();}
+    public ChessGame getChessGame(int gameID) throws DataAccessException {return gameDatas.get(gameID).game();}
 
     @Override
-    public void clearGameData() throws DataAccessException {gameIDs.clear();}
+    public void clearGameData() throws DataAccessException {
+        gameDatas.clear();}
 
     @Override
     public boolean isAuthorized(String authToken) throws DataAccessException {return (getAuthData(authToken) != null);}
