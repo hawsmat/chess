@@ -228,13 +228,11 @@ public class MySqlDataAccess implements DataAccess {
     public ChessGame getChessGame(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT chessGame FROM gameData WHERE gameID=?";
-            try (PreparedStatement ps = conn.prepareStatement(statement)){
-                ps.setInt(1, gameID);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-
-                    }
-                }
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ps.setInt(1, gameID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Gson().fromJson(rs.getString("gameData"), ChessGame.class);
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
