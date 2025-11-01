@@ -75,11 +75,11 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public AuthData getAuthData(String username) throws DataAccessException {
+    public AuthData getAuthData(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT FROM authdata WHERE username=?";
+            String statement = "SELECT * FROM authtokens WHERE authtoken=?";
             PreparedStatement ps = conn.prepareStatement(statement);
-            ps.setString(1, username);
+            ps.setString(1, authToken);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new AuthData(rs.getString("authtoken"), rs.getString("username"));
@@ -117,11 +117,11 @@ public class MySqlDataAccess implements DataAccess {
     public int addGame(String gameName) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "INSERT INTO gamedata (gamename, game) VALUES (?, ?)";
-            PreparedStatement ps = conn.prepareStatement(statement);
+            PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS);
             ps.setString(1, gameName);
             String gameData = new Gson().toJson(new ChessGame());
             ps.setString(2, gameData);
-            ps.executeQuery();
+            ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 return rs.getInt(1);
@@ -135,12 +135,12 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT FROM gamedata WHERE gameid=?";
+            String statement = "SELECT * FROM gamedata WHERE gameid=?";
             PreparedStatement ps = conn.prepareStatement(statement);
             ps.setInt(1, gameID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                ChessGame chessGame = new Gson().fromJson(rs.getString("gamedata"), ChessGame.class);
+                ChessGame chessGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
                 return new GameData(rs.getInt("gameid"), rs.getString("whiteusername"),
                         rs.getString("blackusername"), rs.getString("gamename"), chessGame);
             }
@@ -168,15 +168,30 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void updateUsernames(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "UPDATE gamedata SET teamcolor=? WHERE gameid=?";
-            PreparedStatement ps = conn.prepareStatement(statement);
-            ps.setString(1, username);
-            ps.setInt(2, gameID);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            try (Connection conn = DatabaseManager.getConnection()) {
+                String statement = "UPDATE gamedata SET whiteusername=? WHERE gameid=?";
+                PreparedStatement ps = conn.prepareStatement(statement);
+                ps.setString(1, username);
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                throw new DataAccessException(e.getMessage());
+            }
         }
+        else {
+            try (Connection conn = DatabaseManager.getConnection()) {
+                String statement = "UPDATE gamedata SET blackusername=? WHERE gameid=?";
+                PreparedStatement ps = conn.prepareStatement(statement);
+                ps.setString(1, username);
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        }
+
+
     }
 
     @Override
