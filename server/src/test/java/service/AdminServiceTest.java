@@ -11,7 +11,5 @@ class AdminServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         AdminService adminService = new AdminService(memoryDataAccess);
-
-
     }
 }
