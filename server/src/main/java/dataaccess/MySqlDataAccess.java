@@ -253,7 +253,17 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public boolean isAuthorized(String authToken) throws DataAccessException {
-        return false;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT authToken from AuthToken";
+            PreparedStatement ps = conn.prepareStatement(statement);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     private final String[] createStatements = {
