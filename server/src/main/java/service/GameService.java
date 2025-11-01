@@ -3,6 +3,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
+import model.AuthData;
 import model.CreateGameData;
 import model.JoinGameData;
 import model.ListGameResult;
@@ -41,6 +42,10 @@ public class GameService {
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException, UnauthorizedException, DataAccessException {
         if (dataAccess.isAuthorized(authToken)) {
+            AuthData authdata = dataAccess.getAuthData(authToken);
+            if (authdata == null) {
+                throw new UnauthorizedException("Invalid authToken");
+            }
             if (dataAccess.getGame(joinGameData.gameID()) != null) {
                 if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
                     if (dataAccess.getWhiteUsername(joinGameData.gameID()) == null) {

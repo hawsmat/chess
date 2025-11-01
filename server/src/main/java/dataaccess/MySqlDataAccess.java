@@ -102,11 +102,11 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuthData(String username) throws DataAccessException {
+    public void deleteAuthData(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "DELETE FROM authdata WHERE username=?";
+            String statement = "DELETE FROM authtokens WHERE authToken=?";
             PreparedStatement ps = conn.prepareStatement(statement);
-            ps.setString(1, username);
+            ps.setString(1, authToken);
             ps.executeUpdate();
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -190,8 +190,6 @@ public class MySqlDataAccess implements DataAccess {
                 throw new DataAccessException(e.getMessage());
             }
         }
-
-
     }
 
     @Override
@@ -218,7 +216,7 @@ public class MySqlDataAccess implements DataAccess {
             ps.setInt(1, gameID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                rs.getString("blackusername");
+                return rs.getString("blackusername");
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
