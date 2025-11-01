@@ -288,21 +288,21 @@ public class MySqlDataAccess implements DataAccess {
             gameid INT NOT NULL AUTO_INCREMENT,
             whiteusername VARCHAR(255) DEFAULT NULL,
             blackusername VARCHAR(255) DEFAULT NULL,
-            gamename VARCHAR(255) DEFAULT NULL,
+            gamename VARCHAR(255) NOT NULL,
             game LONGTEXT NOT NULL,
             PRIMARY KEY (gameID)
             );
             """,
             """
             CREATE TABLE IF NOT EXISTS authdata (
-            username VARCHAR(255) DEFAULT NULL,
-            password VARCHAR(255) DEFAULT NULL
+            username VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255)NOT NULL
             );
             """,
             """
             CREATE TABLE IF NOT EXISTS authtokens(
-            authtoken VARCHAR(255) DEFAULT NULL,
-            username VARCHAR(255) DEFAULT NULL
+            authtoken VARCHAR(255)NOT NULL UNIQUE,
+            username VARCHAR(255)NOT NULL
             );
             """
     };
