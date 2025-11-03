@@ -194,7 +194,7 @@ class MySqlDataAccessTest {
         assertThrows(DataAccessException.class, ()->mySqlDataAccess.getWhiteUsername(1));
         assertThrows(DataAccessException.class, ()->mySqlDataAccess.getBlackUsername(1));
         assertThrows(DataAccessException.class, ()->mySqlDataAccess.getGameName(1));
-        assertThrows(DataAccessException.class, ()->mySqlDataAccess.getChessGame(1));
+        assertNull(assertDoesNotThrow(()->mySqlDataAccess.getChessGame(1)));
     }
 
     @Test
