@@ -179,51 +179,22 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void getWhiteUsernameSuccess() {
+    void getGameDatasSuccess() {
         int id = assertDoesNotThrow(()->mySqlDataAccess.addGame("name"));
         assertDoesNotThrow(()->mySqlDataAccess.updateUsernames(id, ChessGame.TeamColor.WHITE, "matt"));
         assertDoesNotThrow(()->mySqlDataAccess.getWhiteUsername(id));
+        assertDoesNotThrow(()->mySqlDataAccess.updateUsernames(id, ChessGame.TeamColor.BLACK, "joe"));
+        assertDoesNotThrow(()->mySqlDataAccess.getBlackUsername(id));
+        assertDoesNotThrow(()->mySqlDataAccess.getGameName(id));
+        assertDoesNotThrow(()->mySqlDataAccess.getChessGame(id));
     }
 
     @Test
-    void getWhiteUsernameFailureNotExist() {
+    void getGameDatasFailureNotExist() {
         assertThrows(DataAccessException.class, ()->mySqlDataAccess.getWhiteUsername(1));
-    }
-
-    @Test
-    void getBlackUsernameSuccess() {
-        int id = assertDoesNotThrow(()->mySqlDataAccess.addGame("name"));
-        assertDoesNotThrow(()->mySqlDataAccess.updateUsernames(id, ChessGame.TeamColor.WHITE, "matt"));
-        assertDoesNotThrow(()->mySqlDataAccess.getWhiteUsername(id));
-    }
-
-    @Test
-    void getBlackUsernameFailureNotExist() {
-        assertThrows(DataAccessException.class, ()->mySqlDataAccess.getWhiteUsername(1));
-    }
-
-    @Test
-    void getGameNameSuccess() {
-        int id = assertDoesNotThrow(()->mySqlDataAccess.addGame("name"));
-        assertDoesNotThrow(()->mySqlDataAccess.updateUsernames(id, ChessGame.TeamColor.WHITE, "matt"));
-        assertDoesNotThrow(()->mySqlDataAccess.getWhiteUsername(id));
-    }
-
-    @Test
-    void getGameNameFailureNotExist() {
-        assertThrows(DataAccessException.class, ()->mySqlDataAccess.getWhiteUsername(1));
-    }
-
-    @Test
-    void getChessGameSuccess() {
-        int id = assertDoesNotThrow(()->mySqlDataAccess.addGame("name"));
-        assertDoesNotThrow(()->mySqlDataAccess.updateUsernames(id, ChessGame.TeamColor.WHITE, "matt"));
-        assertDoesNotThrow(()->mySqlDataAccess.getWhiteUsername(id));
-    }
-
-    @Test
-    void getChessGameFailureNotExist() {
-        assertThrows(DataAccessException.class, ()->mySqlDataAccess.getWhiteUsername(1));
+        assertThrows(DataAccessException.class, ()->mySqlDataAccess.getBlackUsername(1));
+        assertThrows(DataAccessException.class, ()->mySqlDataAccess.getGameName(1));
+        assertThrows(DataAccessException.class, ()->mySqlDataAccess.getChessGame(1));
     }
 
     @Test
