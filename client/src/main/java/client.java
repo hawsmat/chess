@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class client {
-        private boolean LoggedIn = false;
+    private boolean loggedIn = false;
     public client() {
         System.out.println("hello world");
         commands();
@@ -13,7 +13,18 @@ public class client {
         while (!result.equals("quit")) {
             String line = scanner.nextLine();
             result = evaluateInput(line);
-            System.out.println(line);
+            if (result.equals("help")) {
+                commands();
+            }
+            else if (result.equals("login")) {
+                commands();
+            }
+            else if (result.equals("logout")) {
+                commands();
+            }
+            else {
+                System.out.println(result);
+            }
         }
         System.out.println("you quit");
     }
@@ -36,6 +47,7 @@ public class client {
                 case "list" -> list(params);
                 case "join" -> join(params);
                 case "observe" -> observe(params);
+                case "logout" -> logout(params);
                 default -> "help";
             };
         } catch (Exception e) {
@@ -44,67 +56,78 @@ public class client {
     }
 
     public String login(String[] params)throws Exception {
-        if (params.length >= 3) {
-            return "";
+        if (params.length >= 2) {
+            loggedIn = true;
+            return "login";
         }
-        throw new Exception("Expected: <>");
+        throw new Exception("Expected: <username> <password>");
     }
 
     public String register(String[] params) throws Exception {
-        if (params.length >= 0) {
-            return "";
+        if (params.length >= 3) {
+            return "register";
         }
-        throw new Exception("Expected: <>");
+        throw new Exception("Expected: <username> <email> <password>");
     }
 
     public String create(String[] params) throws Exception{
-        if (params.length >= 1) {
-            return "";
+        if (loggedIn && params.length >= 1) {
+            return "create";
         }
-        throw new Exception("Expected: <>");
+        throw new Exception("Expected: <Game name>");
     }
 
-    public String list(String[] params) throws Exception{
-        return "";
+    public String list(String[] params) throws Exception {
+        if (loggedIn) {
+            return "list";
+        }
+        else {
+            throw new Exception("You are not logged in!");
+        }
     }
 
     public String join(String[] params) throws Exception{
-        if (params.length >= 2) {
-            return "";
+        if (loggedIn && params.length >= 2) {
+            return "join";
         }
-        throw new Exception("Expected: <>");
+        throw new Exception("Expected: <Color> <Game ID>");
     }
 
     public String observe(String[] params) throws Exception {
-        if (params.length >= 1) {
-            return "";
+        if (loggedIn && params.length >= 1) {
+            return "observe";
         }
-        throw new Exception("Expected: <>");
+        throw new Exception("Expected: <Game ID>");
+    }
+
+    public String logout(String[] params) throws Exception {
+        loggedIn = false;
+        return "logout";
     }
 
     public void commands() {
-        if (!LoggedIn) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "help" + EscapeSequences.RESET_TEXT_COLOR +
+        if (!loggedIn) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "help" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - list commands");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "login <username> <password>" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "login <username> <password>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - log in to chess server");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "register <username> <password> <email>" +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "register <username> <password> <email>" +
                     EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - register account for access to chess server");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "quit" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "quit" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - exit");
         }
         else {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "help" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "help" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - list commands");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "create <game name>" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "create <game name>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - create a chess game");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "list" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "list" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - list available chess games");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "join <color> <game id>" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "join <color> <game id>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - ");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "observe <game id>" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "observe <game id>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - watch a current chess game");
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_RED + "logout" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "logout" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - log out of the chess server");
         }
     }
