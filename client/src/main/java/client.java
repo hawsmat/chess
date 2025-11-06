@@ -2,15 +2,19 @@ import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.Scanner;
+import server.ServerFacade;
 
 public class client {
     private boolean loggedIn = false;
+    ServerFacade server = new ServerFacade();
     public client() {
+
         System.out.println("hello world");
         commands();
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("quit")) {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + ">>> ");
             String line = scanner.nextLine();
             result = evaluateInput(line);
             if (result.equals("help")) {
