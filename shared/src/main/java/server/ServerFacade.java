@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import model.UserData;
 
 public class ServerFacade {
     private HttpClient client = HttpClient.newHttpClient();
@@ -13,13 +16,17 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public void register() {}
-    public void login() {}
-    public void logout() {}
-    public void create(){}
-    public void list() {}
-    public void join() {}
-    public void observe() {}
+    public UserData register(UserData userData) throws Exception {
+        HttpRequest request = buildRequest("POST", "/userData", userData);
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, UserData.class);
+    }
+    public void login() throws Exception {}
+    public void logout() throws Exception {}
+    public void create() throws Exception{}
+    public void list() throws Exception {}
+    public void join() throws Exception {}
+    public void observe() throws Exception {}
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
@@ -35,6 +42,14 @@ public class ServerFacade {
             return HttpRequest.BodyPublishers.ofString(new Gson().toJson(request));
         } else {
             return HttpRequest.BodyPublishers.noBody();
+        }
+    }
+
+    private HttpResponse<String> sendRequest(HttpRequest request) throws Exception {
+        try {
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception ex) {
+            throw new Exception(ex.getMessage());
         }
     }
 

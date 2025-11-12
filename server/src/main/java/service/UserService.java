@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import model.AuthData;
+import model.RegisterResult;
 import model.LoginData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
@@ -15,20 +15,20 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public AuthData register(UserData user) throws AlreadyTakenException, DataAccessException {
+    public RegisterResult register(UserData user) throws AlreadyTakenException, DataAccessException {
         if (dataAccess.getUser(user.username()) == null) {
             UserData newUser = new UserData(user.username(),BCrypt.hashpw(user.password(), BCrypt.gensalt()), user.email());
             dataAccess.createUser(newUser);
             String authToken = UUID.randomUUID().toString();
-            AuthData authData = new AuthData(authToken, user.username());
-            dataAccess.addAuthData(authData);
-            return authData;
+            RegisterResult registerResult = new RegisterResult(authToken, user.username());
+            dataAccess.addAuthData(registerResult);
+            return registerResult;
         } else {
             throw new AlreadyTakenException("username already exists");
         }
     }
 
-    public AuthData login(LoginData loginData) throws UnauthorizedException, DataAccessException {
+    public RegisterResult login(LoginData loginData) throws UnauthorizedException, DataAccessException {
         if (dataAccess.getUser(loginData.username()) == null) {
             throw new UnauthorizedException("username does not exist");
         }
@@ -36,9 +36,9 @@ public class UserService {
             throw new UnauthorizedException("incorrect password");
         }
         String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, loginData.username());
-        dataAccess.addAuthData(authData);
-        return authData;
+        RegisterResult registerResult = new RegisterResult(authToken, loginData.username());
+        dataAccess.addAuthData(registerResult);
+        return registerResult;
     }
 
     public void logout(String authToken) throws UnauthorizedException, DataAccessException {

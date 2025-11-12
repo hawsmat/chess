@@ -2,17 +2,15 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import model.AuthData;
+import model.RegisterResult;
 import model.GameData;
 import model.LoginData;
 import model.UserData;
 
 import java.sql.*;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -62,12 +60,12 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void addAuthData(AuthData authData) throws DataAccessException {
+    public void addAuthData(RegisterResult registerResult) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "INSERT INTO authtokens (authtoken, username) VALUES (?, ?)";
             PreparedStatement ps = conn.prepareStatement(statement);
-            ps.setString(1, authData.authToken());
-            ps.setString(2, authData.username());
+            ps.setString(1, registerResult.authToken());
+            ps.setString(2, registerResult.username());
             ps.executeUpdate();
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -75,14 +73,14 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public AuthData getAuthData(String authToken) throws DataAccessException {
+    public RegisterResult getAuthData(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT * FROM authtokens WHERE authtoken=?";
             PreparedStatement ps = conn.prepareStatement(statement);
             ps.setString(1, authToken);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new AuthData(rs.getString("authtoken"), rs.getString("username"));
+                return new RegisterResult(rs.getString("authtoken"), rs.getString("username"));
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());

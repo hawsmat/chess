@@ -1,15 +1,12 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.AuthData;
-import model.GameData;
+import model.RegisterResult;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Set;
@@ -78,28 +75,28 @@ class MySqlDataAccessTest {
 
     @Test
     void addAuthDataSuccess() {
-        AuthData authData = new AuthData("token", "username");
-        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(authData));
+        RegisterResult registerResult = new RegisterResult("token", "username");
+        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(registerResult));
     }
 
     @Test
     void addAuthDataFailureDuplicate() {
-        AuthData authData = new AuthData("token", "username");
-        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(authData));
-        assertThrows(DataAccessException.class, ()->mySqlDataAccess.addAuthData(authData));
+        RegisterResult registerResult = new RegisterResult("token", "username");
+        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(registerResult));
+        assertThrows(DataAccessException.class, ()->mySqlDataAccess.addAuthData(registerResult));
     }
 
     @Test
     void addAuthDataFailureNull() {
-        AuthData authData = new AuthData(null, null);
-        assertThrows(DataAccessException.class, ()->mySqlDataAccess.addAuthData(authData));
+        RegisterResult registerResult = new RegisterResult(null, null);
+        assertThrows(DataAccessException.class, ()->mySqlDataAccess.addAuthData(registerResult));
     }
 
     @Test
     void getAuthDataSuccess() {
-        AuthData authData = new AuthData("token", "username");
-        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(authData));
-        assertEquals(authData, assertDoesNotThrow(()->mySqlDataAccess.getAuthData(authData.authToken())));
+        RegisterResult registerResult = new RegisterResult("token", "username");
+        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(registerResult));
+        assertEquals(registerResult, assertDoesNotThrow(()->mySqlDataAccess.getAuthData(registerResult.authToken())));
     }
 
     @Test
@@ -114,9 +111,9 @@ class MySqlDataAccessTest {
 
     @Test
     void deleteAuthDataSuccess() {
-        AuthData authData = new AuthData("token", "user");
-        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(authData));
-        assertDoesNotThrow(()->mySqlDataAccess.deleteAuthData(authData.authToken()));
+        RegisterResult registerResult = new RegisterResult("token", "user");
+        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(registerResult));
+        assertDoesNotThrow(()->mySqlDataAccess.deleteAuthData(registerResult.authToken()));
     }
 
     @Test
@@ -204,7 +201,7 @@ class MySqlDataAccessTest {
 
     @Test
     void isAuthorizedSuccess() {
-        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(new AuthData("token", "matt")));
+        assertDoesNotThrow(()->mySqlDataAccess.addAuthData(new RegisterResult("token", "matt")));
         assertTrue(assertDoesNotThrow(()->mySqlDataAccess.isAuthorized("token")));
     }
 

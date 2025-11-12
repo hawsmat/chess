@@ -1,12 +1,11 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.AuthData;
+import model.RegisterResult;
 import model.GameData;
 import model.LoginData;
 import model.UserData;
 
-import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -14,7 +13,7 @@ public class MemoryDataAccess implements DataAccess {
     private HashMap<String, LoginData> loginDatas = new HashMap<>();
     private HashMap<Integer, GameData> gameDatas = new HashMap<>();
     int gameID = 1;
-    private HashMap<String, AuthData> authDatas = new HashMap<>();
+    private HashMap<String, RegisterResult> authDatas = new HashMap<>();
 
     @Override
     public void clearUserData() throws DataAccessException {
@@ -29,12 +28,12 @@ public class MemoryDataAccess implements DataAccess {
         return loginDatas.get(username);}
 
     @Override
-    public void addAuthData(AuthData authData) {
-        authDatas.put(authData.authToken(), authData);
+    public void addAuthData(RegisterResult registerResult) {
+        authDatas.put(registerResult.authToken(), registerResult);
     }
 
     @Override
-    public AuthData getAuthData(String authToken) throws DataAccessException {return authDatas.get(authToken);}
+    public RegisterResult getAuthData(String authToken) throws DataAccessException {return authDatas.get(authToken);}
 
     @Override
     public void clearAuthData() throws DataAccessException {authDatas.clear();}

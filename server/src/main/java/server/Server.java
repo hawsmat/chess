@@ -49,8 +49,8 @@ public class Server {
                 return;
             }
             try {
-                AuthData authData = userService.register(userData);
-                ctx.json(serializer.toJson(authData));
+                RegisterResult registerResult = userService.register(userData);
+                ctx.json(serializer.toJson(registerResult));
                 ctx.status(200);
             } catch (DataAccessException e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
@@ -77,9 +77,9 @@ public class Server {
             }
 
             try {
-                AuthData authData = userService.login(loginData);
+                RegisterResult registerResult = userService.login(loginData);
                 String str = String.format("{\"username\":\"%s\", \"authToken\":\"%s\"}",
-                        authData.username(), authData.authToken());
+                        registerResult.username(), registerResult.authToken());
                 ctx.status(200).result(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");

@@ -4,7 +4,7 @@ import chess.ChessGame;
 import dataaccess.AlreadyTakenException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
-import model.AuthData;
+import model.RegisterResult;
 import model.CreateGameData;
 import model.JoinGameData;
 import model.UserData;
@@ -21,8 +21,8 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
+        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
     }
 
     @Test
@@ -39,9 +39,9 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
-        assertDoesNotThrow(()->gameService.listGames(authData.authToken()));
+        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
+        assertDoesNotThrow(()->gameService.listGames(registerResult.authToken()));
     }
 
     @Test
@@ -50,8 +50,8 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(()->gameService.listGames(authData.authToken()));
+        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        assertDoesNotThrow(()->gameService.listGames(registerResult.authToken()));
     }
 
     @Test
@@ -60,9 +60,9 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
-        assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
+        assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 
     @Test
@@ -71,8 +71,8 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
+        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
     }
 
     @Test
@@ -81,10 +81,10 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        AuthData authData = assertDoesNotThrow(() -> userService.register(user));
-        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(authData.authToken(), "game")));
-        assertDoesNotThrow(()-> gameService.joinGame(authData.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
-        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(authData.authToken(),
+        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
+        assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(registerResult.authToken(),
                 new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 }
