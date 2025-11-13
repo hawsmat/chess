@@ -6,7 +6,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
+import model.CreateGameData;
+import model.JoinGameData;
+import model.LoginData;
 import model.UserData;
 
 public class ServerFacade {
@@ -17,22 +21,52 @@ public class ServerFacade {
     }
 
     public UserData register(UserData userData) throws Exception {
-        HttpRequest request = buildRequest("POST", "/userData", userData);
+        HttpRequest request = buildRequest("POST", "/user", null, userData);
         HttpResponse<String> response = sendRequest(request);
         return handleResponse(response, UserData.class);
     }
-    public void login() throws Exception {}
-    public void logout() throws Exception {}
-    public void create() throws Exception{}
-    public void list() throws Exception {}
-    public void join() throws Exception {}
+    public LoginData login(LoginData loginData) throws Exception {
+        HttpRequest request = buildRequest("POST", "/session", null, loginData);
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, LoginData.class);
+    }
+    public String logout(String authToken) throws Exception {
+        Map<String, String> headers = Map.of("authorization", authToken);
+        HttpRequest request = buildRequest("DELETE", "/session", headers, null);
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, String.class);
+    }
+    public CreateGameData createGame(CreateGameData createGameData) throws Exception{
+        Map<String, String> headers = Map.of("authorization", createGameData.authToken());
+        HttpRequest request = buildRequest("POST", "/game", headers, createGameData.gameName());
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, CreateGameData.class);
+    }
+    public String listGames(String authToken) throws Exception {
+        Map<String, String> headers = Map.of("authorization", authToken);
+        HttpRequest request = buildRequest("POST", "/game", headers, null);
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, CreateGameData.class);
+    }
+    public JoinGameData join(JoinGameData joinGameData) throws Exception {
+        Map<String, String> headers = Map.of("authorization", joinGameData.authToken());
+        Map<String, Object> body = Map.of("PlayerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
+        HttpRequest request = buildRequest("POST", "/game", headers, body);
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, JoinGameData.class);
+    }
     public void observe() throws Exception {}
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    private HttpRequest buildRequest(String method, String path, Object headers, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
+        if (headers != null) {
+            for (var entry : headers.entrySet()){
+                request.header(entry.getKey(), entry.getValue());
+            }
+        }
         if (body != null) {
-            request.setHeader("Content-Type", "application/json");
+            request.header("Content-Type", "application/json");
         }
         return request.build();
     }

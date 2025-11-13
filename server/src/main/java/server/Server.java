@@ -163,7 +163,6 @@ public class Server {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
                 return;
             }
-
             JoinGameData joinGameData;
             try {
                 joinGameData = new Gson().fromJson(ctx.body(), JoinGameData.class);
@@ -171,7 +170,7 @@ public class Server {
                 ctx.status(400).json("{\"message\": \"Error: bad request\"}");
                 return;
             }
-            if (joinGameData.gameID() == 0 || joinGameData.playerColor() != ChessGame.TeamColor.WHITE &&
+            if (joinGameData.authToken() == null || joinGameData.playerColor() != ChessGame.TeamColor.WHITE &&
                     joinGameData.playerColor() != ChessGame.TeamColor.BLACK) {
                 String str = String.format("{\"message\": \"Error: bad request\"}");
                 ctx.status(400).json(str);

@@ -1,3 +1,4 @@
+import model.UserData;
 import ui.EscapeSequences;
 
 import java.util.Arrays;
@@ -6,8 +7,12 @@ import server.ServerFacade;
 
 public class client {
     private boolean loggedIn = false;
-//    ServerFacade server = new ServerFacade();
-    public client() {
+    private ServerFacade serverFacade;
+    public client(String serverUrl) {
+        serverFacade = new ServerFacade(serverUrl);
+    }
+
+    public void run(){
         commands();
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -61,6 +66,7 @@ public class client {
     public String login(String[] params)throws Exception {
         if (params.length == 2) {
             loggedIn = true;
+//            serverFacade.login();
             return "login";
         }
         throw new Exception("Expected: <username> <password>");
@@ -68,6 +74,7 @@ public class client {
 
     public String register(String[] params) throws Exception {
         if (params.length == 3) {
+            serverFacade.register(new UserData(params[0], params[1], params[2]));
             return "register";
         }
         throw new Exception("Expected: <username> <email> <password>");
