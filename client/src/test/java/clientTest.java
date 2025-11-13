@@ -8,6 +8,7 @@ class clientTest {
     @Test
     void printBoard() {
         Client client = new Client("string");
-        client.printBoard(new ChessGame());
+        client.printBoard(new ChessGame(), "white");
+        client.printBoard(new ChessGame(), "black");
     }
 }

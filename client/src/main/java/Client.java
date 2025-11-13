@@ -105,10 +105,15 @@ public class Client {
             throw new Exception("Not authorized");
         }
         if (params.length == 2) {
-            printBoard(new ChessGame());
-            return "join";
+            if (params[1].equals("white") || params[1].equals("black")) {
+                printBoard(new ChessGame(), params[1]);
+                return "join";
+            }
+            else {
+                throw new Exception("Expected: white | black");
+            }
         }
-        throw new Exception("Expected: <Color> <Game ID>");
+        throw new Exception("Expected: <color> <Game ID>");
     }
 
     public String observe(String[] params) throws Exception {
@@ -116,7 +121,7 @@ public class Client {
             throw new Exception("Not authorized");
         }
         if (params.length == 1) {
-            printBoard(new ChessGame());
+            printBoard(new ChessGame(), "white");
             return "observe";
         }
         throw new Exception("Expected: <Game ID>");
@@ -148,7 +153,7 @@ public class Client {
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - create a chess game");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "list" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - list available chess games");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "join <game id> <color>" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "join <game id> <black | white>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - ");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "observe <game id>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - watch a current chess game");
@@ -163,24 +168,36 @@ public class Client {
         else System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED OUT] ");
     }
 
-    public void printBoard(ChessGame game) {
+    public void printBoard(ChessGame game, String color) {
+        int initial;
+        int direction;
+        int end;
+        if (color.equals("white")) {
+            initial = 1;
+            direction = 1;
+            end = 9;
+        }
+        else {
+            initial = 8;
+            direction = -1;
+            end = 0;
+        }
         List<String> cols = List.of("a", "b", "c", "d", "e", "f", "g", "h");
-        List<String> rows = List.of("1", "2", "3", "4", "5", "6", "7", "8");
-        printCols(cols);
+        List<String> rows = List.of("8", "7", "6", "5", "4", "3", "2", "1");
+        printCols(cols, initial, direction, end);
         System.out.println();
-        for (int i = 1; i < 9; i++) {
+        for (int i = initial; i != end; i += direction) {
             System.out.print(rows.get(i-1) + " ");
-            for (int j = 1; j < 9; j++) {
+            for (int j = initial; j != end; j += direction) {
                 if (game.getBoard().getPiece(new ChessPosition(i, j)) == null) {
                     getBlankSpace(i, j);
                 } else {
                     printPiece(i, j, game.getBoard().getPiece(new ChessPosition(i, j)));
                 }
             }
-
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.RESET_BG_COLOR + " " +rows.get(i-1));
         }
-        printCols(cols);
+        printCols(cols, initial, direction, end);
     }
 
     public void getBlankSpace(int i, int j) {
@@ -222,10 +239,10 @@ public class Client {
         }
     }
 
-    public void printCols(List<String> cols) {
+    public void printCols(List<String> cols, int initial, int direction, int end) {
         System.out.print("  ");
-        for (int i = 0; i<cols.size(); i++) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + cols.get(i) + " ");
+        for (int i = initial; i != end; i+=direction) {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + cols.get(i-1) + " ");
         }
     }
 }
