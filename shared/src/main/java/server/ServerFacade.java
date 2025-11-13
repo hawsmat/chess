@@ -53,5 +53,24 @@ public class ServerFacade {
         }
     }
 
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws Exception {
+        var status = response.statusCode();
+        if (!isSuccessful(status)) {
+            var body = response.body();
+            if (body != null) {
+                throw new Exception();
+            }
+            throw new Exception();
+        }
+        if (responseClass != null) {
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+        return null;
+    }
+
+    private boolean isSuccessful(int status) {
+        return status / 100 == 2;
+    }
+
 
 }

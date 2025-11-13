@@ -6,14 +6,13 @@ import server.ServerFacade;
 
 public class client {
     private boolean loggedIn = false;
-    ServerFacade server = new ServerFacade();
+//    ServerFacade server = new ServerFacade();
     public client() {
-
-        System.out.println("hello world");
         commands();
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("quit")) {
+            getStatus();
             System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + ">>> ");
             String line = scanner.nextLine();
             result = evaluateInput(line);
@@ -60,7 +59,7 @@ public class client {
     }
 
     public String login(String[] params)throws Exception {
-        if (params.length >= 2) {
+        if (params.length == 2) {
             loggedIn = true;
             return "login";
         }
@@ -68,14 +67,14 @@ public class client {
     }
 
     public String register(String[] params) throws Exception {
-        if (params.length >= 3) {
+        if (params.length == 3) {
             return "register";
         }
         throw new Exception("Expected: <username> <email> <password>");
     }
 
     public String create(String[] params) throws Exception{
-        if (loggedIn && params.length >= 1) {
+        if (loggedIn && params.length == 1) {
             return "create";
         }
         throw new Exception("Expected: <Game name>");
@@ -91,14 +90,14 @@ public class client {
     }
 
     public String join(String[] params) throws Exception{
-        if (loggedIn && params.length >= 2) {
+        if (loggedIn && params.length == 2) {
             return "join";
         }
         throw new Exception("Expected: <Color> <Game ID>");
     }
 
     public String observe(String[] params) throws Exception {
-        if (loggedIn && params.length >= 1) {
+        if (loggedIn && params.length == 1) {
             return "observe";
         }
         throw new Exception("Expected: <Game ID>");
@@ -121,6 +120,7 @@ public class client {
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - exit");
         }
         else {
+            getStatus();
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "help" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - list commands");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "create <game name>" + EscapeSequences.RESET_TEXT_COLOR +
@@ -134,5 +134,10 @@ public class client {
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "logout" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - log out of the chess server");
         }
+
+    }
+    public void getStatus() {
+        if (loggedIn) System.out.println("[LOGGED IN] ");
+        else System.out.print("[LOGGED OUT] ");
     }
 }
