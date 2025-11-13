@@ -177,7 +177,7 @@ public class Server {
                 return;
             }
             try {
-                gameService.joinGame(authToken, joinGameData);
+                gameService.joinGame(joinGameData);
                 ctx.status(200);
             } catch (DataAccessException e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);

@@ -71,14 +71,14 @@ class GameServiceTestMySql {
         UserData user = new UserData("matt", "joe", "email");
         RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
-        assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertDoesNotThrow(()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
     }
 
     @Test
     void joinGameGameDoesntExist() {
         UserData user = new UserData("matt", "joe", "email");
         RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
-        assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
+        assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, 1)));
     }
 
     @Test
@@ -86,8 +86,7 @@ class GameServiceTestMySql {
         UserData user = new UserData("matt", "joe", "email");
         RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
-        assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
-        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(registerResult.authToken(),
-                new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertDoesNotThrow(()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
+        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
     }
 }

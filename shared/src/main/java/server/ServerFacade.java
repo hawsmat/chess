@@ -46,7 +46,7 @@ public class ServerFacade {
         Map<String, String> headers = Map.of("authorization", authToken);
         HttpRequest request = buildRequest("POST", "/game", headers, null);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, CreateGameData.class);
+        return handleResponse(response, String.class);
     }
     public JoinGameData join(JoinGameData joinGameData) throws Exception {
         Map<String, String> headers = Map.of("authorization", joinGameData.authToken());
@@ -56,7 +56,7 @@ public class ServerFacade {
         return handleResponse(response, JoinGameData.class);
     }
     public void observe() throws Exception {}
-    private HttpRequest buildRequest(String method, String path, Object headers, Object body) {
+    private HttpRequest buildRequest(String method, String path, Map<String, String> headers, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));

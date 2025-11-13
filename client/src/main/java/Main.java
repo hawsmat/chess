@@ -7,7 +7,7 @@ public class Main {
             serverUrl = args[1];
         }
         try {
-            new client(serverUrl).run();
+            new Client(serverUrl).run();
         } catch (Throwable ex ){
             System.out.printf("unable to start server: %s", ex.getMessage());
         }
