@@ -54,7 +54,7 @@ public class Client {
                 case "login" -> login(params);
                 case "register" -> register(params);
                 case "create" -> create(params);
-                case "list" -> list(params);
+                case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout(params);
@@ -119,11 +119,21 @@ public class Client {
         return "failed";
     }
 
-    public String list(String[] params) throws Exception {
+    public String list() throws Exception {
         if (loggedIn) {
             try {
                  GameLists gameLists = serverFacade.listGames(authToken);
-                 System.out.println(gameLists);
+                 for (int i = 0; i < gameLists.games().size(); i++) {
+                     ListGameResult game = gameLists.games().get(i);
+                     String blackUser = (game.blackUsername() == null) ? "<Empty>" : game.blackUsername();
+                     String whiteUser = (game.whiteUsername() == null) ? "<Empty>" : game.whiteUsername();
+                     int num = i + 1;
+                     String str =  EscapeSequences.SET_TEXT_COLOR_RED + num + ". Game Name: " +
+                         EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.gameName() +
+                         "," + EscapeSequences.SET_TEXT_COLOR_RED + " White Player: " + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + whiteUser +
+                        "," + EscapeSequences.SET_TEXT_COLOR_RED + " Black Player: " + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + blackUser;
+                     System.out.println(str);
+                 }
                  return "list";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -140,6 +150,14 @@ public class Client {
         }
         if (params.length == 2) {
             if (params[1].equals("white") || params[1].equals("black")) {
+                ChessGame.TeamColor playerColor;
+                if (params[1].equals("white")) {
+                    playerColor = ChessGame.TeamColor.WHITE;
+                }
+                else {
+                    playerColor = ChessGame.TeamColor.BLACK;
+                }
+                serverFacade.join(new JoinGameData(authToken, playerColor, Integer.parseInt(params[0])));
                 printBoard(new ChessGame(), params[1]);
                 return "join";
             }
