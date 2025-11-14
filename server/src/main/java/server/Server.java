@@ -185,7 +185,6 @@ public class Server {
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (AlreadyTakenException e) {
-                ;
                 ctx.status(403).json("{\"message\": \"Error: already taken\"}");
             }
         }

@@ -51,12 +51,12 @@ public class ServerFacade {
         return handleResponse(response, GameLists.class);
     }
 
-    public JoinGameData join(JoinGameData joinGameData) throws Exception {
+    public void join(JoinGameData joinGameData) throws Exception {
         Map<String, String> headers = Map.of("authorization", joinGameData.authToken());
-        Map<String, Object> body = Map.of("PlayerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
+        Map<String, Object> body = Map.of("authToken", joinGameData.authToken(),"playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
         HttpRequest request = buildRequest("PUT", "/game", headers, body);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, JoinGameData.class);
+        handleResponse(response, null);
     }
 
     public void observe() throws Exception {}
@@ -96,7 +96,15 @@ public class ServerFacade {
         var status = response.statusCode();
         String body = response.body();
         if (status/100 != 2) {
-            throw new Exception("HTTP " + status + ": " + response.body());
+            if (status == 401) {
+                throw new Exception("You are not authorized.");
+            }
+            else if (status == 403) {
+                throw new Exception("That is already taken.");
+            }
+            else {
+                throw new Exception("There was an internal error.");
+            }
         }
         if (responseClass != null && body != null && !body.isBlank()) {
             return new Gson().fromJson(response.body(), responseClass);

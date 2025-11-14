@@ -32,8 +32,10 @@ public class Client {
                 commands();
             } else if (result.equals("logout")) {
                 commands();
+            } else if (result.equals("register")) {
+                commands();
             } else {
-                System.out.println(result);
+                commands();
             }
         }
         System.out.println("you quit");
@@ -103,18 +105,27 @@ public class Client {
 
     public String create(String[] params) throws Exception {
         if (!loggedIn) {
-            throw new Exception("Not authorized");
+            throw new Exception("You are not logged in");
         }
-        if (params.length == 1) {
-            try {
-                serverFacade.createGame(new CreateGameData(authToken, params[0]));
-                return "create";
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+        if (params.length == 0) {
+            throw new Exception("Expected: <Game name>");
+        }
+
+        String gameName = "";
+        for (int i = 0; i < params.length; i++) {
+            if (i == params.length - 1){
+                gameName += params[i];
+            }
+            else {
+                gameName += params[i] + " ";
             }
         }
-        else {
-            throw new Exception("Expected: <Game name>");
+        try {
+            serverFacade.createGame(new CreateGameData(authToken, gameName));
+            System.out.println("Created new game: " + gameName);
+            return "create";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         return "failed";
     }
@@ -139,14 +150,14 @@ public class Client {
                 System.out.println(e.getMessage());
             }
         } else {
-            throw new Exception("Not authorized");
+            throw new Exception("You are not logged in ");
         }
         return "failed";
     }
 
     public String join(String[] params) throws Exception {
         if (!loggedIn) {
-            throw new Exception("Not authorized");
+            throw new Exception("You are not logged in");
         }
         if (params.length == 2) {
             if (params[1].equals("white") || params[1].equals("black")) {
@@ -158,6 +169,7 @@ public class Client {
                     playerColor = ChessGame.TeamColor.BLACK;
                 }
                 serverFacade.join(new JoinGameData(authToken, playerColor, Integer.parseInt(params[0])));
+                System.out.println("joined a game as " + params[1] + " player.");
                 printBoard(new ChessGame(), params[1]);
                 return "join";
             }
@@ -170,7 +182,7 @@ public class Client {
 
     public String observe(String[] params) throws Exception {
         if (!loggedIn) {
-            throw new Exception("Not authorized");
+            throw new Exception("You are not logged in");
         }
         if (params.length == 1) {
             printBoard(new ChessGame(), "white");
@@ -223,7 +235,7 @@ public class Client {
     }
 
     public void getStatus() {
-        if (loggedIn) System.out.print("[LOGGED IN] ");
+        if (loggedIn) System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED IN] ");
         else System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED OUT] ");
     }
 
