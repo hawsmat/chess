@@ -33,45 +33,48 @@ public class GameService {
         throw new UnauthorizedException("not authorzied");
     }
 
-    public int createGame(CreateGameData createGameData) throws UnauthorizedException, DataAccessException {
-        if (dataAccess.isAuthorized(createGameData.authToken())) {
+    public int createGame(String authToken, CreateGameData createGameData) throws UnauthorizedException, DataAccessException {
+        if (dataAccess.isAuthorized(authToken)) {
             return dataAccess.addGame(createGameData.gameName());
         }
         throw new UnauthorizedException("not authorized");
     }
 
-    public void joinGame(JoinGameData joinGameData) throws AlreadyTakenException, UnauthorizedException, DataAccessException {
-        if (dataAccess.isAuthorized(joinGameData.authToken())) {
-            LoginResult authdata = dataAccess.getAuthData(joinGameData.authToken());
-            if (authdata == null) {
-                throw new UnauthorizedException("Invalid authToken");
-            }
-            if (dataAccess.getGame(joinGameData.gameID()) != null) {
-                if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
-                    if (dataAccess.getWhiteUsername(joinGameData.gameID()) == null) {
-                        dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
-                                dataAccess.getAuthData(joinGameData.authToken()).username());
-                    }
-                    else {
-                        throw new AlreadyTakenException("color already taken");
-                    }
-                }
-                else {
-                    if (dataAccess.getBlackUsername(joinGameData.gameID()) == null) {
-                        dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
-                                dataAccess.getAuthData(joinGameData.authToken()).username());
-                    }
-                    else {
-                        throw new AlreadyTakenException("color already taken");
-                    }
-                }
+    public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException, UnauthorizedException, DataAccessException, Exception{
+        if (!dataAccess.isAuthorized(authToken)) {
+            throw new UnauthorizedException("not authorized");
+        }
+
+        LoginResult authdata = dataAccess.getAuthData(authToken);
+        if (authdata == null) {
+            throw new UnauthorizedException("Invalid authToken");
+        }
+
+        if (dataAccess.getGame(joinGameData.gameID()) == null) {
+            throw new UnauthorizedException("gameID does not exist");
+
+        }
+        if (joinGameData.playerColor() != ChessGame.TeamColor.WHITE &&
+                joinGameData.playerColor() != ChessGame.TeamColor.BLACK) {
+            throw new Exception("bad color");
+        }
+        if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
+            if (dataAccess.getWhiteUsername(joinGameData.gameID()) == null) {
+                dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
+                        dataAccess.getAuthData(authToken).username());
             }
             else {
-                throw new UnauthorizedException("gameID does not exist");
+                throw new AlreadyTakenException("color already taken");
             }
         }
         else {
-            throw new UnauthorizedException("not authorized");
+            if (dataAccess.getBlackUsername(joinGameData.gameID()) == null) {
+                dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
+                        dataAccess.getAuthData(authToken).username());
+            }
+            else {
+                throw new AlreadyTakenException("color already taken");
+            }
         }
     }
 }

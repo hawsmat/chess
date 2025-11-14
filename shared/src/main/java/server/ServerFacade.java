@@ -42,12 +42,18 @@ public class ServerFacade {
         handleResponse(response, String.class);
     }
 
-    public void createGame(CreateGameData createGameData) throws Exception{
-        Map<String, String> headers = Map.of("authorization", createGameData.authToken());
+    public int createGame(String authToken, CreateGameData createGameData) throws Exception{
+        Map<String, String> headers = Map.of("authorization", authToken);
         Map<String, Object> body = Map.of("gameName", createGameData.gameName());
         HttpRequest request = buildRequest("POST", "/game", headers, body);
         HttpResponse<String> response = sendRequest(request);
-        handleResponse(response, null);
+        CreateGameResult createGameResult = handleResponse(response, CreateGameResult.class);
+        if (createGameResult == null) {
+            throw new Exception("failed to create the game");
+        }
+        else {
+            return createGameResult.gameID();
+        }
     }
 
     public GameLists listGames(String authToken) throws Exception {
@@ -57,9 +63,9 @@ public class ServerFacade {
         return handleResponse(response, GameLists.class);
     }
 
-    public void join(JoinGameData joinGameData) throws Exception {
-        Map<String, String> headers = Map.of("authorization", joinGameData.authToken());
-        Map<String, Object> body = Map.of("authToken", joinGameData.authToken(),"playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
+    public void join(String authToken, JoinGameData joinGameData) throws Exception {
+        Map<String, String> headers = Map.of("authorization", authToken);
+        Map<String, Object> body = Map.of("playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
         HttpRequest request = buildRequest("PUT", "/game", headers, body);
         HttpResponse<String> response = sendRequest(request);
         handleResponse(response, null);

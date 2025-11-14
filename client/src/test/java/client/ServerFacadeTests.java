@@ -74,12 +74,12 @@ public class ServerFacadeTests {
         LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
-        assertDoesNotThrow(()->serverFacade.createGame(new CreateGameData(loginResult.authToken(), "name")));
+        assertDoesNotThrow(()->serverFacade.createGame(loginResult.authToken(), new CreateGameData("a")));
     }
 
     @Test
      void createGameFailureNotAuthorized() {
-        assertThrows(Exception.class, ()->serverFacade.createGame(new CreateGameData("authtoken", "name")));
+        assertThrows(Exception.class, ()->serverFacade.createGame("authtoken", new CreateGameData("name")));
     }
 
     @Test
@@ -88,8 +88,8 @@ public class ServerFacadeTests {
         LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
-        assertDoesNotThrow(()->serverFacade.createGame(new CreateGameData(loginResult.authToken(), "name")));
-        assertDoesNotThrow(()->serverFacade.createGame(new CreateGameData(loginResult.authToken(), "game")));
+        assertDoesNotThrow(()->serverFacade.createGame(loginResult.authToken(), new CreateGameData("name")));
+        assertDoesNotThrow(()->serverFacade.createGame(loginResult.authToken(), new CreateGameData("game")));
         assertDoesNotThrow(()->serverFacade.listGames(loginResult.authToken()));
 
     }
@@ -104,10 +104,10 @@ public class ServerFacadeTests {
         UserData userData = new UserData("user", "pass", "email");
         LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
-        assertDoesNotThrow(()->serverFacade.login(loginData));
-        CreateGameData createGameData = new CreateGameData(loginResult.authToken(), "name");
-        assertDoesNotThrow(()->serverFacade.createGame(createGameData));
-        assertDoesNotThrow(()->serverFacade.join(new JoinGameData(loginResult.authToken(), ChessGame.TeamColor.WHITE, 1)));
+        LoginResult newLoginResult = assertDoesNotThrow(()->serverFacade.login(loginData));
+        CreateGameData createGameData = new CreateGameData("name");
+        Integer gameID = (assertDoesNotThrow(()->serverFacade.createGame(newLoginResult.authToken(), createGameData)));
+        assertDoesNotThrow(()->serverFacade.join(newLoginResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ServerFacadeTests {
         LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
-        assertThrows(Exception.class, ()->serverFacade.join(new JoinGameData(loginResult.authToken(), ChessGame.TeamColor.WHITE, 1)));
+        assertThrows(Exception.class, ()->serverFacade.join(loginResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
     }
 
 }

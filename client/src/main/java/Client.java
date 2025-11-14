@@ -121,7 +121,7 @@ public class Client {
             }
         }
         try {
-            serverFacade.createGame(new CreateGameData(authToken, gameName));
+            serverFacade.createGame(authToken, new CreateGameData(gameName));
             System.out.println("Created new game: " + gameName);
             return "create";
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class Client {
                 else {
                     playerColor = ChessGame.TeamColor.BLACK;
                 }
-                serverFacade.join(new JoinGameData(authToken, playerColor, Integer.parseInt(params[0])));
+                serverFacade.join(authToken, new JoinGameData(playerColor, Integer.parseInt(params[0])));
                 System.out.println("joined a game as " + params[1] + " player.");
                 printBoard(new ChessGame(), params[1]);
                 return "join";

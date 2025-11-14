@@ -144,9 +144,9 @@ public class Server {
                 ctx.status(400).json(str);
                 return;
             }
-            CreateGameData createGameData = new CreateGameData(authToken, gameName);
+            CreateGameData createGameData = new CreateGameData(gameName);
             try {
-                int gameID = gameService.createGame(createGameData);
+                int gameID = gameService.createGame(authToken, createGameData);
                 String str = String.format("{\"gameID\": %d}", gameID);
                 ctx.status(200).json(str);
             } catch (UnauthorizedException e) {
@@ -170,14 +170,13 @@ public class Server {
                 ctx.status(400).json("{\"message\": \"Error: bad request\"}");
                 return;
             }
-            if (joinGameData.authToken() == null || joinGameData.playerColor() != ChessGame.TeamColor.WHITE &&
-                    joinGameData.playerColor() != ChessGame.TeamColor.BLACK) {
-                String str = String.format("{\"message\": \"Error: bad request\"}");
+            if (joinGameData == null || joinGameData.gameID() <=0 || joinGameData.playerColor() == null) {
+                String str = "{\"message\": \"Error: bad request\"}";
                 ctx.status(400).json(str);
                 return;
             }
             try {
-                gameService.joinGame(joinGameData);
+                gameService.joinGame(authToken, joinGameData);
                 ctx.status(200);
             } catch (DataAccessException e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
@@ -186,6 +185,9 @@ public class Server {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (AlreadyTakenException e) {
                 ctx.status(403).json("{\"message\": \"Error: already taken\"}");
+            } catch (Exception e) {
+                String str = "{\"message\": \"Error: internal server error\"}";
+                ctx.status(500).json(str);
             }
         }
 

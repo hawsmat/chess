@@ -22,7 +22,7 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
+        assertDoesNotThrow(()-> gameService.createGame(registerResult.authToken(), new CreateGameData("game")));
     }
 
     @Test
@@ -30,7 +30,7 @@ class GameServiceTest {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
-        assertThrows(UnauthorizedException.class, ()-> gameService.createGame(new CreateGameData("a", "game")));
+        assertThrows(UnauthorizedException.class, ()-> gameService.createGame("a", new CreateGameData("game")));
     }
 
     @Test
@@ -40,7 +40,7 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
+        assertDoesNotThrow(()-> gameService.createGame(registerResult.authToken(), new CreateGameData("game")));
         assertDoesNotThrow(()->gameService.listGames(registerResult.authToken()));
     }
 
@@ -61,8 +61,8 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
-        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
-        assertDoesNotThrow(()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(registerResult.authToken(), new CreateGameData("game")));
+        assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 
     @Test
@@ -72,7 +72,7 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
-        assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, 1)));
+        assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, 1)));
     }
 
     @Test
@@ -82,8 +82,8 @@ class GameServiceTest {
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
-        int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
-        assertDoesNotThrow(()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
-        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(registerResult.authToken(), new CreateGameData("game")));
+        assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 }
