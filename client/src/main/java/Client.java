@@ -43,7 +43,7 @@ public class Client {
 
     public String evaluateInput(String line) {
         try {
-            String[] tokens = line.toLowerCase().split(" ");
+            String[] tokens = line.split(" ");
             String command;
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             if (tokens.length > 0) {
