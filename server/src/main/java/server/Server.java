@@ -60,7 +60,6 @@ public class Server {
             }
         }
 
-
         private void login (Context ctx){
             var serializer = new Gson();
             LoginData loginData;

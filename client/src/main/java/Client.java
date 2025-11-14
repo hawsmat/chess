@@ -165,39 +165,38 @@ public class Client {
         if (!loggedIn) {
             throw new Exception("You are not logged in");
         }
-        if (params.length == 2) {
-            int gameID;
-            try {
-                gameID = Integer.parseInt(params[0]);
-            } catch (Exception e) {
-                throw new Exception("Game ID needs to be a number");
-            }
-            if (gameID <= 0) {
-                throw new Exception("That Game ID does not exist");
-            }
-            if (params[1].equals("white") || params[1].equals("black")) {
-                ChessGame.TeamColor playerColor;
-                if (params[1].equals("white")) {
-                    playerColor = ChessGame.TeamColor.WHITE;
-                }
-                else {
-                    playerColor = ChessGame.TeamColor.BLACK;
-                }
-                try {
-                    serverFacade.join(authToken, new JoinGameData(playerColor, gameID));
-                    System.out.println("joined a game as " + params[1] + " player.");
-                    printBoard(new ChessGame(), params[1]);
-                    return "";
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
+        if (params.length != 2) {
+            throw new Exception("Expected: <Game ID> <color>");
+        }
+        int gameID;
+        try {
+            gameID = Integer.parseInt(params[0]);
+        } catch (Exception e) {
+            throw new Exception("Game ID needs to be a number");
+        }
+
+        if (gameID <= 0) {
+            throw new Exception("That Game ID does not exist");
+        }
+        if (params[1].equals("white") || params[1].equals("black")) {
+            ChessGame.TeamColor playerColor;
+            if (params[1].equals("white")) {
+                playerColor = ChessGame.TeamColor.WHITE;
             }
             else {
-                throw new Exception("Expected: white | black");
+                playerColor = ChessGame.TeamColor.BLACK;
+            }
+            try {
+                serverFacade.join(authToken, new JoinGameData(playerColor, gameID));
+                System.out.println("joined a game as " + params[1] + " player.");
+                printBoard(new ChessGame(), params[1]);
+                return "";
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         }
         else {
-            throw new Exception("Expected: <color> <Game ID>");
+            throw new Exception("Expected: white | black");
         }
         return "failed";
     }
