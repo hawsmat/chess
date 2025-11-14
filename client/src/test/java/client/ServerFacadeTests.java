@@ -1,10 +1,8 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.AlreadyTakenException;
-import model.CreateGameData;
-import model.LoginData;
-import model.LoginResult;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
@@ -107,14 +105,18 @@ public class ServerFacadeTests {
         LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
+        CreateGameData createGameData = new CreateGameData(loginResult.authToken(), "name");
+        assertDoesNotThrow(()->serverFacade.createGame(createGameData));
+        assertDoesNotThrow(()->serverFacade.join(new JoinGameData(loginResult.authToken(), ChessGame.TeamColor.WHITE, 1)));
     }
 
     @Test
-     void joinGameFailure() {
+     void joinGameFailureNotExist() {
         UserData userData = new UserData("user", "pass", "email");
         LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
+        assertThrows(Exception.class, ()->serverFacade.join(new JoinGameData(loginResult.authToken(), ChessGame.TeamColor.WHITE, 1)));
     }
 
 }
