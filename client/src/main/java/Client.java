@@ -25,7 +25,11 @@ public class Client {
             getStatus();
             System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + ">>> ");
             String line = scanner.nextLine();
-            result = evaluateInput(line);
+            try {
+                result = evaluateInput(line);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
             if (result.equals("help")) {
                 commands();
             } else if (result.equals("login")) {
@@ -34,7 +38,10 @@ public class Client {
                 commands();
             } else if (result.equals("register")) {
                 commands();
+            } else if (result.isEmpty()){
+                System.out.println();
             } else {
+                System.out.println(result);
                 commands();
             }
         }
@@ -59,7 +66,7 @@ public class Client {
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
-                case "logout" -> logout(params);
+                case "logout" -> logout();
                 default -> "help";
             };
         } catch (Exception e) {
@@ -79,7 +86,7 @@ public class Client {
                 System.out.println("Logged in as " + params[0]);
                 return "login";
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                throw new Exception(e.getMessage());
             }
         }
         throw new Exception("Expected: <username> <password>");
@@ -110,7 +117,6 @@ public class Client {
         if (params.length == 0) {
             throw new Exception("Expected: <Game name>");
         }
-
         String gameName = "";
         for (int i = 0; i < params.length; i++) {
             if (i == params.length - 1){
@@ -123,7 +129,7 @@ public class Client {
         try {
             serverFacade.createGame(authToken, new CreateGameData(gameName));
             System.out.println("Created new game: " + gameName);
-            return "create";
+            return "";
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -145,7 +151,7 @@ public class Client {
                         "," + EscapeSequences.SET_TEXT_COLOR_RED + " Black Player: " + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + blackUser;
                      System.out.println(str);
                  }
-                 return "list";
+                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -160,6 +166,15 @@ public class Client {
             throw new Exception("You are not logged in");
         }
         if (params.length == 2) {
+            int gameID;
+            try {
+                gameID = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new Exception("Game ID needs to be a number");
+            }
+            if (gameID <= 0) {
+                throw new Exception("That Game ID does not exist");
+            }
             if (params[1].equals("white") || params[1].equals("black")) {
                 ChessGame.TeamColor playerColor;
                 if (params[1].equals("white")) {
@@ -168,16 +183,23 @@ public class Client {
                 else {
                     playerColor = ChessGame.TeamColor.BLACK;
                 }
-                serverFacade.join(authToken, new JoinGameData(playerColor, Integer.parseInt(params[0])));
-                System.out.println("joined a game as " + params[1] + " player.");
-                printBoard(new ChessGame(), params[1]);
-                return "join";
+                try {
+                    serverFacade.join(authToken, new JoinGameData(playerColor, gameID));
+                    System.out.println("joined a game as " + params[1] + " player.");
+                    printBoard(new ChessGame(), params[1]);
+                    return "";
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
             else {
                 throw new Exception("Expected: white | black");
             }
         }
-        throw new Exception("Expected: <color> <Game ID>");
+        else {
+            throw new Exception("Expected: <color> <Game ID>");
+        }
+        return "failed";
     }
 
     public String observe(String[] params) throws Exception {
@@ -185,8 +207,21 @@ public class Client {
             throw new Exception("You are not logged in");
         }
         if (params.length == 1) {
-            printBoard(new ChessGame(), "white");
-            return "observe";
+            int gameID;
+            try {
+                gameID = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new Exception("Game ID needs to be a number");
+            }
+            if (gameID <= 0) {
+                throw new Exception("That game ID does not exist");
+            }
+            try {
+                printBoard(new ChessGame(), "white");
+                return "";
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
         throw new Exception("Expected: <Game ID>");
     }
@@ -224,9 +259,9 @@ public class Client {
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - create a chess game");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "list" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - list available chess games");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "join <game id> <black | white>" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "join <game ID> <black | white>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - ");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "observe <game id>" + EscapeSequences.RESET_TEXT_COLOR +
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "observe <game ID>" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - watch a current chess game");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "logout" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - log out of the chess server");
