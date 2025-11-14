@@ -1,6 +1,7 @@
 package client;
 
 import dataaccess.AlreadyTakenException;
+import model.CreateGameData;
 import model.LoginData;
 import model.LoginResult;
 import model.UserData;
@@ -61,7 +62,6 @@ public class ServerFacadeTests {
      void logoutSuccess() {
         UserData userData = new UserData("user", "pass", "email");
         LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
-        LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.logout(loginResult.authToken()));
     }
 
@@ -73,39 +73,38 @@ public class ServerFacadeTests {
     @Test
      void createGameSuccess() {
         UserData userData = new UserData("user", "pass", "email");
-        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
+        assertDoesNotThrow(()->serverFacade.createGame(new CreateGameData(loginResult.authToken(), "name")));
     }
 
     @Test
-     void createGameFailure() {
-        UserData userData = new UserData("user", "pass", "email");
-        assertDoesNotThrow(()->serverFacade.register(userData));
-        LoginData loginData = new LoginData(userData.username(), userData.password());
-        assertDoesNotThrow(()->serverFacade.login(loginData));
+     void createGameFailureNotAuthorized() {
+        assertThrows(Exception.class, ()->serverFacade.createGame(new CreateGameData("authtoken", "name")));
     }
 
     @Test
      void listGamesSuccess() {
         UserData userData = new UserData("user", "pass", "email");
-        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
+        assertDoesNotThrow(()->serverFacade.createGame(new CreateGameData(loginResult.authToken(), "name")));
+        assertDoesNotThrow(()->serverFacade.createGame(new CreateGameData(loginResult.authToken(), "game")));
+        assertDoesNotThrow(()->serverFacade.listGames(loginResult.authToken()));
+
     }
 
     @Test
-     void listGamesFailure() {
-        UserData userData = new UserData("user", "pass", "email");
-        assertDoesNotThrow(()->serverFacade.register(userData));
-        LoginData loginData = new LoginData(userData.username(), userData.password());
-        assertDoesNotThrow(()->serverFacade.login(loginData));
+     void listGamesFailureNotAuthorized() {
+        assertThrows(Exception.class, ()->serverFacade.listGames("auth"));
     }
 
     @Test
      void joinGameSuccess() {
         UserData userData = new UserData("user", "pass", "email");
-        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
     }
@@ -113,7 +112,7 @@ public class ServerFacadeTests {
     @Test
      void joinGameFailure() {
         UserData userData = new UserData("user", "pass", "email");
-        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
         LoginData loginData = new LoginData(userData.username(), userData.password());
         assertDoesNotThrow(()->serverFacade.login(loginData));
     }
