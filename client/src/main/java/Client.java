@@ -5,7 +5,7 @@ import ui.EscapeSequences;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import server.ServerFacade;
+import serverFacade.ServerFacade;
 import model.*;
 
 public class Client {
@@ -191,7 +191,7 @@ public class Client {
         throw new Exception("Expected: <Game ID>");
     }
 
-    public String logout(String[] params) throws Exception {
+    public String logout() throws Exception {
         if (!loggedIn) {
             throw new Exception("You are not logged in");
         } else {
