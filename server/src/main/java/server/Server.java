@@ -115,12 +115,12 @@ public class Server {
             try {
                 List<ListGameResult> games = gameService.listGames(authToken);
                 String str = String.format("{\"games\": %s}", new Gson().toJson(games));
-                ctx.status(200).json(str);
+                ctx.status(200).result(str);
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (DataAccessException e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
-                ctx.status(500).json(str);
+                ctx.status(500).result(str);
             }
         }
 

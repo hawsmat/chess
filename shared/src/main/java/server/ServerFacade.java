@@ -44,11 +44,11 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public ListGameResult listGames(String authToken) throws Exception {
+    public GameLists listGames(String authToken) throws Exception {
         Map<String, String> headers = Map.of("authorization", authToken);
         HttpRequest request = buildRequest("GET", "/game", headers, null);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, ListGameResult.class);
+        return handleResponse(response, GameLists.class);
     }
 
     public JoinGameData join(JoinGameData joinGameData) throws Exception {

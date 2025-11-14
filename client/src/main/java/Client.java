@@ -122,8 +122,8 @@ public class Client {
     public String list(String[] params) throws Exception {
         if (loggedIn) {
             try {
-                 ListGameResult listGameResult = serverFacade.listGames(authToken);
-                 System.out.println(listGameResult);
+                 GameLists gameLists = serverFacade.listGames(authToken);
+                 System.out.println(gameLists);
                  return "list";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
