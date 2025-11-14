@@ -56,7 +56,8 @@ class GameServiceTestMySql {
         UserData user = new UserData("matt", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
-        assertDoesNotThrow(()->gameService.listGames(registerResult.authToken()));
+        assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "hello")));
+        System.out.println(assertDoesNotThrow(()->gameService.listGames(registerResult.authToken())));
     }
 
     @Test

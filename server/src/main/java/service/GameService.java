@@ -22,10 +22,10 @@ public class GameService {
         List<ListGameResult> gameData = new ArrayList<>();
         if (dataAccess.isAuthorized(authToken)) {
             for (int gameID : dataAccess.getGames()) {
-                ListGameResult listGameResult = new ListGameResult(dataAccess.getGame(gameID).gameID(),
-                        dataAccess.getGame(gameID).whiteUsername(),
-                        dataAccess.getGame(gameID).blackUsername(),
-                        dataAccess.getGame(gameID).gameName());
+                ListGameResult listGameResult = new ListGameResult(gameID,
+                        dataAccess.getWhiteUsername(gameID),
+                        dataAccess.getBlackUsername(gameID),
+                        dataAccess.getGameName(gameID));
                 gameData.add(listGameResult);
             }
             return gameData;

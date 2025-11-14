@@ -135,7 +135,7 @@ public class Server {
                 var map = new Gson().fromJson(ctx.body(), Map.class);
                 gameName = (String) map.get("gameName");
             } catch (Exception e) {
-                String str = String.format("{\"message\": \"Error: bad request\"}", e);
+                String str = String.format("{\"message\": \"Error: %s\"}", e);
                 ctx.status(400).json(str);
                 return;
             }

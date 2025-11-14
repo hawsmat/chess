@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Map;
 import model.*;
 
@@ -16,10 +17,10 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public UserData register(UserData userData) throws Exception {
+    public LoginResult register(UserData userData) throws Exception {
         HttpRequest request = buildRequest("POST", "/user", null, userData);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, UserData.class);
+        return handleResponse(response, LoginResult.class);
     }
 
     public LoginResult login(LoginData loginData) throws Exception {
@@ -28,26 +29,26 @@ public class ServerFacade {
         return handleResponse(response, LoginResult.class);
     }
 
-    public String logout(String authToken) throws Exception {
+    public void logout(String authToken) throws Exception {
         Map<String, String> headers = Map.of("authorization", authToken);
         HttpRequest request = buildRequest("DELETE", "/session", headers, null);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, String.class);
+        handleResponse(response, String.class);
     }
 
-    public CreateGameData createGame(CreateGameData createGameData) throws Exception{
+    public void createGame(CreateGameData createGameData) throws Exception{
         Map<String, String> headers = Map.of("authorization", createGameData.authToken());
-        Map<String, Object> body = Map.of("GameName", createGameData.gameName());
+        Map<String, Object> body = Map.of("gameName", createGameData.gameName());
         HttpRequest request = buildRequest("POST", "/game", headers, body);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, CreateGameData.class);
+        handleResponse(response, null);
     }
 
-    public String listGames(String authToken) throws Exception {
+    public ListGameResult listGames(String authToken) throws Exception {
         Map<String, String> headers = Map.of("authorization", authToken);
         HttpRequest request = buildRequest("GET", "/game", headers, null);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, String.class);
+        return handleResponse(response, ListGameResult.class);
     }
 
     public JoinGameData join(JoinGameData joinGameData) throws Exception {

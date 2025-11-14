@@ -145,7 +145,9 @@ class MySqlDataAccessTest {
     @Test
     void getGamesSuccess() {
         assertDoesNotThrow(()->mySqlDataAccess.addGame("name"));
+        assertDoesNotThrow(()->mySqlDataAccess.addGame("name"));
         Set<Integer> games = assertDoesNotThrow(()->mySqlDataAccess.getGames());
+        System.out.println(games);
         assertNotEquals(0, games.size());
     }
 

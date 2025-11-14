@@ -2,8 +2,6 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import ui.EscapeSequences;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -76,7 +74,8 @@ public class Client {
                 LoginResult loginResult = serverFacade.login(new LoginData(params[0], params[1]));
                 authToken = loginResult.authToken();
                 loggedIn = true;
-                return "Logged in as " + params[0];
+                System.out.println("Logged in as " + params[0]);
+                return "login";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -90,8 +89,11 @@ public class Client {
         }
         if (params.length == 3) {
             try {
-                serverFacade.register(new UserData(params[0], params[1], params[2]));
-                return "registered " + params[0];
+                LoginResult loginResult = serverFacade.register(new UserData(params[0], params[1], params[2]));
+                authToken = loginResult.authToken();
+                System.out.println("registered " + params[0]);
+                loggedIn = true;
+                return "register";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -106,17 +108,23 @@ public class Client {
         if (params.length == 1) {
             try {
                 serverFacade.createGame(new CreateGameData(authToken, params[0]));
+                return "create";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
-        throw new Exception("Expected: <Game name>");
+        else {
+            throw new Exception("Expected: <Game name>");
+        }
+        return "failed";
     }
 
     public String list(String[] params) throws Exception {
         if (loggedIn) {
             try {
-                return serverFacade.listGames(authToken);
+                 ListGameResult listGameResult = serverFacade.listGames(authToken);
+                 System.out.println(listGameResult);
+                 return "list";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -160,6 +168,8 @@ public class Client {
             try {
                 serverFacade.logout(authToken);
                 loggedIn = false;
+                System.out.println("Logged out");
+                return "logout";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -229,6 +239,7 @@ public class Client {
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.RESET_BG_COLOR + " " +rows.get(i-1));
         }
         printCols(cols, initial, direction, end);
+        System.out.println();
     }
 
     public void getBlankSpace(int i, int j) {
