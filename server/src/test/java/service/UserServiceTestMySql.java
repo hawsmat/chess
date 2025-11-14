@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import model.RegisterResult;
+import model.LoginResult;
 import model.LoginData;
 import model.UserData;
 import org.junit.jupiter.api.AfterEach;
@@ -109,7 +109,7 @@ class UserServiceTestMySql {
             MySqlDataAccess mySqlDataAccess = new MySqlDataAccess();
             UserService userService = new UserService(mySqlDataAccess);
             UserData user = new UserData("matt", "joe", "email");
-            RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+            LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
             assertDoesNotThrow(() -> userService.logout(registerResult.authToken()));
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
@@ -133,7 +133,7 @@ class UserServiceTestMySql {
             MySqlDataAccess mySqlDataAccess = new MySqlDataAccess();
             UserService userService = new UserService(mySqlDataAccess);
             UserData user = new UserData("matt", "joe", "email");
-            RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+            LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
             assertDoesNotThrow(() -> userService.logout(registerResult.authToken()));
             assertThrows(UnauthorizedException.class, () -> userService.logout(registerResult.authToken()));
         } catch (DataAccessException e) {

@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import server.ServerFacade;
+import model.*;
 
 public class Client {
     private boolean loggedIn = false;
+    private String authToken;
     private ServerFacade serverFacade;
 
     public Client(String serverUrl) {
@@ -66,18 +68,33 @@ public class Client {
     }
 
     public String login(String[] params) throws Exception {
+        if (loggedIn) {
+            throw new Exception("Already logged in");
+        }
         if (params.length == 2) {
-            loggedIn = true;
-//            serverFacade.login(new LoginData(params[0], params[1]));
-            return "login";
+            try {
+                LoginResult loginResult = serverFacade.login(new LoginData(params[0], params[1]));
+                authToken = loginResult.authToken();
+                loggedIn = true;
+                return "Logged in as " + params[0];
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
         throw new Exception("Expected: <username> <password>");
     }
 
     public String register(String[] params) throws Exception {
+        if (loggedIn) {
+            throw new Exception("Can't register while logged in.");
+        }
         if (params.length == 3) {
-//            serverFacade.register(new UserData(params[0], params[1], params[2]));
-            return "register";
+            try {
+                serverFacade.register(new UserData(params[0], params[1], params[2]));
+                return "registered " + params[0];
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
         throw new Exception("Expected: <username> <email> <password>");
     }
@@ -87,17 +104,26 @@ public class Client {
             throw new Exception("Not authorized");
         }
         if (params.length == 1) {
-            return "create";
+            try {
+                serverFacade.createGame(new CreateGameData(authToken, params[0]));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
         throw new Exception("Expected: <Game name>");
     }
 
     public String list(String[] params) throws Exception {
         if (loggedIn) {
-            return "list";
+            try {
+                return serverFacade.listGames(authToken);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         } else {
             throw new Exception("Not authorized");
         }
+        return "failed";
     }
 
     public String join(String[] params) throws Exception {
@@ -131,9 +157,14 @@ public class Client {
         if (!loggedIn) {
             throw new Exception("You are not logged in");
         } else {
-            loggedIn = false;
-            return "logout";
+            try {
+                serverFacade.logout(authToken);
+                loggedIn = false;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
+        return "failed";
     }
 
     public void commands() {

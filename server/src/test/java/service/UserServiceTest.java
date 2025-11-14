@@ -4,7 +4,7 @@ import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
-import model.RegisterResult;
+import model.LoginResult;
 import model.LoginData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
@@ -67,8 +67,8 @@ class UserServiceTest {
         MemoryDataAccess memoryDataAccess = new MemoryDataAccess();
         UserService userService = new UserService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
-        assertDoesNotThrow(() -> userService.logout(registerResult.authToken()));
+        LoginResult loginResult = assertDoesNotThrow(() -> userService.register(user));
+        assertDoesNotThrow(() -> userService.logout(loginResult.authToken()));
     }
 
     @Test

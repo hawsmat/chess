@@ -1,7 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.RegisterResult;
+import model.LoginResult;
 import model.GameData;
 import model.LoginData;
 import model.UserData;
@@ -13,7 +13,7 @@ public class MemoryDataAccess implements DataAccess {
     private HashMap<String, LoginData> loginDatas = new HashMap<>();
     private HashMap<Integer, GameData> gameDatas = new HashMap<>();
     int gameID = 1;
-    private HashMap<String, RegisterResult> authDatas = new HashMap<>();
+    private HashMap<String, LoginResult> authDatas = new HashMap<>();
 
     @Override
     public void clearUserData() throws DataAccessException {
@@ -28,12 +28,12 @@ public class MemoryDataAccess implements DataAccess {
         return loginDatas.get(username);}
 
     @Override
-    public void addAuthData(RegisterResult registerResult) {
+    public void addAuthData(LoginResult registerResult) {
         authDatas.put(registerResult.authToken(), registerResult);
     }
 
     @Override
-    public RegisterResult getAuthData(String authToken) throws DataAccessException {return authDatas.get(authToken);}
+    public LoginResult getAuthData(String authToken) throws DataAccessException {return authDatas.get(authToken);}
 
     @Override
     public void clearAuthData() throws DataAccessException {authDatas.clear();}

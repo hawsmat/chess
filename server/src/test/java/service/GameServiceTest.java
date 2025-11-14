@@ -4,7 +4,7 @@ import chess.ChessGame;
 import dataaccess.AlreadyTakenException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.UnauthorizedException;
-import model.RegisterResult;
+import model.LoginResult;
 import model.CreateGameData;
 import model.JoinGameData;
 import model.UserData;
@@ -21,7 +21,7 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
     }
 
@@ -39,7 +39,7 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
         assertDoesNotThrow(()->gameService.listGames(registerResult.authToken()));
     }
@@ -50,7 +50,7 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         assertDoesNotThrow(()->gameService.listGames(registerResult.authToken()));
     }
 
@@ -60,7 +60,7 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
         assertDoesNotThrow(()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
     }
@@ -71,7 +71,7 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         assertThrows(UnauthorizedException.class, ()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, 1)));
     }
 
@@ -81,7 +81,7 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
-        RegisterResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(new CreateGameData(registerResult.authToken(), "game")));
         assertDoesNotThrow(()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));
         assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(new JoinGameData(registerResult.authToken(), ChessGame.TeamColor.WHITE, gameID)));

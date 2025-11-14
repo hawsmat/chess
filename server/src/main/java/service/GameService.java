@@ -3,7 +3,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
-import model.RegisterResult;
+import model.LoginResult;
 import model.CreateGameData;
 import model.JoinGameData;
 import model.ListGameResult;
@@ -42,7 +42,7 @@ public class GameService {
 
     public void joinGame(JoinGameData joinGameData) throws AlreadyTakenException, UnauthorizedException, DataAccessException {
         if (dataAccess.isAuthorized(joinGameData.authToken())) {
-            RegisterResult authdata = dataAccess.getAuthData(joinGameData.authToken());
+            LoginResult authdata = dataAccess.getAuthData(joinGameData.authToken());
             if (authdata == null) {
                 throw new UnauthorizedException("Invalid authToken");
             }

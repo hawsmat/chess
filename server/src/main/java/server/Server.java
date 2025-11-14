@@ -49,7 +49,7 @@ public class Server {
                 return;
             }
             try {
-                RegisterResult registerResult = userService.register(userData);
+                LoginResult registerResult = userService.register(userData);
                 ctx.json(serializer.toJson(registerResult));
                 ctx.status(200);
             } catch (DataAccessException e) {
@@ -77,7 +77,7 @@ public class Server {
             }
 
             try {
-                RegisterResult registerResult = userService.login(loginData);
+                LoginResult registerResult = userService.login(loginData);
                 String str = String.format("{\"username\":\"%s\", \"authToken\":\"%s\"}",
                         registerResult.username(), registerResult.authToken());
                 ctx.status(200).result(str);

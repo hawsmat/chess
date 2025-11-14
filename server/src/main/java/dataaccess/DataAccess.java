@@ -1,7 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.RegisterResult;
+import model.LoginResult;
 import model.GameData;
 import model.LoginData;
 import model.UserData;
@@ -12,8 +12,8 @@ public interface DataAccess {
     void clearUserData() throws DataAccessException;
     void createUser(UserData user) throws DataAccessException;
     LoginData getUser(String username) throws DataAccessException;
-    void addAuthData(RegisterResult registerResult) throws DataAccessException;
-    RegisterResult getAuthData(String authToken) throws DataAccessException;
+    void addAuthData(LoginResult registerResult) throws DataAccessException;
+    LoginResult getAuthData(String authToken) throws DataAccessException;
     void clearAuthData() throws DataAccessException;
     void deleteAuthData(String username) throws DataAccessException;
     int addGame(String gameName) throws DataAccessException;

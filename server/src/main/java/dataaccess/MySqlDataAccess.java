@@ -2,7 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import model.RegisterResult;
+import model.LoginResult;
 import model.GameData;
 import model.LoginData;
 import model.UserData;
@@ -60,7 +60,7 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void addAuthData(RegisterResult registerResult) throws DataAccessException {
+    public void addAuthData(LoginResult registerResult) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "INSERT INTO authtokens (authtoken, username) VALUES (?, ?)";
             PreparedStatement ps = conn.prepareStatement(statement);
@@ -73,14 +73,14 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     @Override
-    public RegisterResult getAuthData(String authToken) throws DataAccessException {
+    public LoginResult getAuthData(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT * FROM authtokens WHERE authtoken=?";
             PreparedStatement ps = conn.prepareStatement(statement);
             ps.setString(1, authToken);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new RegisterResult(rs.getString("authtoken"), rs.getString("username"));
+                return new LoginResult(rs.getString("authtoken"), rs.getString("username"));
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());

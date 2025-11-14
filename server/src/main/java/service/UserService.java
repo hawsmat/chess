@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import model.RegisterResult;
+import model.LoginResult;
 import model.LoginData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
@@ -15,20 +15,20 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public RegisterResult register(UserData user) throws AlreadyTakenException, DataAccessException {
+    public LoginResult register(UserData user) throws AlreadyTakenException, DataAccessException {
         if (dataAccess.getUser(user.username()) == null) {
             UserData newUser = new UserData(user.username(),BCrypt.hashpw(user.password(), BCrypt.gensalt()), user.email());
             dataAccess.createUser(newUser);
             String authToken = UUID.randomUUID().toString();
-            RegisterResult registerResult = new RegisterResult(authToken, user.username());
-            dataAccess.addAuthData(registerResult);
-            return registerResult;
+            LoginResult loginResult = new LoginResult(authToken, user.username());
+            dataAccess.addAuthData(loginResult);
+            return loginResult;
         } else {
             throw new AlreadyTakenException("username already exists");
         }
     }
 
-    public RegisterResult login(LoginData loginData) throws UnauthorizedException, DataAccessException {
+    public LoginResult login(LoginData loginData) throws UnauthorizedException, DataAccessException {
         if (dataAccess.getUser(loginData.username()) == null) {
             throw new UnauthorizedException("username does not exist");
         }
@@ -36,7 +36,7 @@ public class UserService {
             throw new UnauthorizedException("incorrect password");
         }
         String authToken = UUID.randomUUID().toString();
-        RegisterResult registerResult = new RegisterResult(authToken, loginData.username());
+        LoginResult registerResult = new LoginResult(authToken, loginData.username());
         dataAccess.addAuthData(registerResult);
         return registerResult;
     }
