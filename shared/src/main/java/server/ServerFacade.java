@@ -17,6 +17,12 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public void clear() throws Exception{
+        HttpRequest request = buildRequest("DELETE", "/db", null, null);
+        HttpResponse<String> response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
     public LoginResult register(UserData userData) throws Exception {
         HttpRequest request = buildRequest("POST", "/user", null, userData);
         HttpResponse<String> response = sendRequest(request);

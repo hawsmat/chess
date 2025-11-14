@@ -1,11 +1,17 @@
 package client;
 
+import dataaccess.AlreadyTakenException;
+import model.LoginData;
+import model.LoginResult;
+import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
+import server.ServerFacade;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
-
+    private static ServerFacade serverFacade;
     private static Server server;
 
     @BeforeAll
@@ -13,17 +19,104 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+        serverFacade = new ServerFacade("http://localhost:" + port);
     }
 
-    @AfterAll
-    static void stopServer() {
-        server.stop();
+    @BeforeEach
+     void clearServer() {
+        try {
+            serverFacade.clear();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    void registerSuccess() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+    }
+
+    @Test
+     void registerFailureAlreadyExists() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        assertThrows(Exception.class, ()->serverFacade.register(userData));
+    }
+
+    @Test
+     void loginSuccess() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.login(loginData));
+    }
+
+    @Test
+     void loginFailureDoesNotExist() {
+        assertThrows(Exception.class, ()->serverFacade.login(new LoginData("user", "pass")));
+    }
+
+    @Test
+     void logoutSuccess() {
+        UserData userData = new UserData("user", "pass", "email");
+        LoginResult loginResult = assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.logout(loginResult.authToken()));
+    }
+
+    @Test
+     void logoutFailureNotExist() {
+        assertThrows(Exception.class, ()-> serverFacade.logout("string"));
+    }
+
+    @Test
+     void createGameSuccess() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.login(loginData));
+    }
+
+    @Test
+     void createGameFailure() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.login(loginData));
+    }
+
+    @Test
+     void listGamesSuccess() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.login(loginData));
+    }
+
+    @Test
+     void listGamesFailure() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.login(loginData));
+    }
+
+    @Test
+     void joinGameSuccess() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.login(loginData));
+    }
+
+    @Test
+     void joinGameFailure() {
+        UserData userData = new UserData("user", "pass", "email");
+        assertDoesNotThrow(()->serverFacade.register(userData));
+        LoginData loginData = new LoginData(userData.username(), userData.password());
+        assertDoesNotThrow(()->serverFacade.login(loginData));
     }
 
 }
+
