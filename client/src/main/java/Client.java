@@ -5,7 +5,7 @@ import ui.EscapeSequences;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import ServerFacade.ServerFacade;
+import serverfacade.ServerFacade;
 import model.*;
 
 public class Client {
