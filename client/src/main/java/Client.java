@@ -215,7 +215,7 @@ public class Client {
         if (!loggedIn) {
             throw new Exception("You are not logged in");
         }
-        if (params == null || params.length == 1) {
+        if (params.length == 1) {
             int gameID;
             try {
                 gameID = Integer.parseInt(params[0]);
