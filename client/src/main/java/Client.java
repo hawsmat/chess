@@ -88,7 +88,7 @@ public class Client {
         if (loggedIn) {
             throw new Exception("Already logged in");
         }
-        if (params == null || params.length == 2) {
+        if (params.length == 2) {
             try {
                 LoginResult loginResult = facade().login(new LoginData(params[0], params[1]));
                 authToken = loginResult.authToken();
@@ -106,7 +106,7 @@ public class Client {
         if (loggedIn) {
             throw new Exception("Can't register while logged in.");
         }
-        if (params == null || params.length == 3) {
+        if (params.length == 3) {
             try {
                 LoginResult loginResult = facade().register(new UserData(params[0], params[1], params[2]));
                 authToken = loginResult.authToken();
@@ -124,7 +124,7 @@ public class Client {
         if (!loggedIn) {
             throw new Exception("You are not logged in");
         }
-        if (params == null || params.length == 0) {
+        if (params.length == 0) {
             throw new Exception("Expected: <Game name>");
         }
         String gameName = "";
@@ -175,7 +175,7 @@ public class Client {
         if (!loggedIn) {
             throw new Exception("You are not logged in");
         }
-        if (params == null || params.length != 2) {
+        if (params.length != 2) {
             throw new Exception("Expected: <Game ID> <color>");
         }
         int gameID;
