@@ -8,8 +8,8 @@ public class Main {
         }
         try {
             new Client(serverUrl).run();
-        } catch (Throwable ex ){
-            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
         }
     }
 }

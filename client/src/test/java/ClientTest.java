@@ -1,9 +1,7 @@
 import chess.ChessGame;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class clientTest {
+class ClientTest {
 
     @Test
     void printBoard() {

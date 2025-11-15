@@ -64,13 +64,14 @@ public class ServerFacade {
 
     public void join(String authToken, JoinGameData joinGameData) throws Exception {
         Map<String, String> headers = Map.of("authorization", authToken);
-        Map<String, Object> body = Map.of("playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
-        HttpRequest request = buildRequest("PUT", "/game", headers, body);
+//        Map<String, Object> body = Map.of("playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
+        HttpRequest request = buildRequest("PUT", "/game", headers, joinGameData);
         HttpResponse<String> response = sendRequest(request);
         handleResponse(response, null);
     }
 
     public void observe() throws Exception {}
+
     private HttpRequest buildRequest(String method, String path, Map<String, String> headers, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
