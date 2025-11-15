@@ -137,7 +137,7 @@ public class Client {
             }
         }
         try {
-            facade().createGame(authToken, new CreateGameData(gameName));
+            int gameID = facade().createGame(authToken, new CreateGameData(gameName));
             System.out.println("Created new game: " + gameName);
             return "";
         } catch (Exception e) {
@@ -198,8 +198,8 @@ public class Client {
             }
             try {
                 facade().join(authToken, new JoinGameData(playerColor, gameID));
-                System.out.println("joined a game as " + params[1] + " player.");
-                printBoard(new ChessGame(), params[1]);
+                System.out.println("joined a game as " + playerColor + " player.");
+                printBoard(new ChessGame(), playerColor);
                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -226,7 +226,7 @@ public class Client {
                 throw new Exception("That game ID does not exist");
             }
             try {
-                printBoard(new ChessGame(), "white");
+                printBoard(new ChessGame(), ChessGame.TeamColor.WHITE);
                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -283,11 +283,11 @@ public class Client {
         else System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED OUT] ");
     }
 
-    public void printBoard(ChessGame game, String color) {
+    public void printBoard(ChessGame game, ChessGame.TeamColor color) {
         int initial;
         int direction;
         int end;
-        if (color.equals("white")) {
+        if (color.equals(ChessGame.TeamColor.WHITE)) {
             initial = 1;
             direction = 1;
             end = 9;
