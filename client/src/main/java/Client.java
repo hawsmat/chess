@@ -5,7 +5,7 @@ import ui.EscapeSequences;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import serverFacade.ServerFacade;
+import ServerFacade.ServerFacade;
 import model.*;
 
 public class Client {
@@ -279,8 +279,8 @@ public class Client {
     }
 
     public void getStatus() {
-        if (loggedIn) System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED IN] ");
-        else System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED OUT] ");
+        if (loggedIn) {System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED IN] ");}
+        else {System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED OUT] ");}
     }
 
     public void printBoard(ChessGame game, ChessGame.TeamColor color) {

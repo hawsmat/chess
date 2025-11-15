@@ -40,7 +40,8 @@ public class GameService {
         throw new UnauthorizedException("not authorized");
     }
 
-    public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException, UnauthorizedException, DataAccessException, Exception{
+    public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException,
+            UnauthorizedException, DataAccessException, Exception{
         if (!dataAccess.isAuthorized(authToken)) {
             throw new UnauthorizedException("not authorized");
         }

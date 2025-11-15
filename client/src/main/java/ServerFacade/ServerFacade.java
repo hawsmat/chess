@@ -1,14 +1,13 @@
-package serverFacade;
+package ServerFacade;
 
 import com.google.gson.Gson;
+import model.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
 import java.util.Map;
-import model.*;
 
 public class ServerFacade {
     private HttpClient client = HttpClient.newHttpClient();
@@ -65,13 +64,14 @@ public class ServerFacade {
 
     public void join(String authToken, JoinGameData joinGameData) throws Exception {
         Map<String, String> headers = Map.of("authorization", authToken);
-        Map<String, Object> body = Map.of("playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
-        HttpRequest request = buildRequest("PUT", "/game", headers, body);
+//        Map<String, Object> body = Map.of("playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
+        HttpRequest request = buildRequest("PUT", "/game", headers, joinGameData);
         HttpResponse<String> response = sendRequest(request);
         handleResponse(response, null);
     }
 
     public void observe() throws Exception {}
+
     private HttpRequest buildRequest(String method, String path, Map<String, String> headers, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
