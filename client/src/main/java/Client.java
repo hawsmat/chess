@@ -60,11 +60,13 @@ public class Client {
         try {
             String[] tokens = line.split(" ");
             String command;
-            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            String[] params;
             if (tokens.length > 0) {
                 command = tokens[0];
+                params = Arrays.copyOfRange(tokens, 1, tokens.length);
             } else {
                 command = "help";
+                params = new String[0];
             }
             return switch (command) {
                 case "quit" -> "quit";
