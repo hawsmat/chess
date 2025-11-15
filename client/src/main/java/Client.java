@@ -12,9 +12,17 @@ public class Client {
     private boolean loggedIn = false;
     private String authToken;
     private ServerFacade serverFacade;
+    private String serverUrl;
 
     public Client(String serverUrl) {
-        serverFacade = new ServerFacade(serverUrl);
+        this.serverUrl=serverUrl;
+    }
+
+    private ServerFacade facade() {
+        if (serverFacade == null) {
+            serverFacade = new ServerFacade(serverUrl);
+        }
+        return serverFacade;
     }
 
     public void run() {
@@ -80,7 +88,7 @@ public class Client {
         }
         if (params.length == 2) {
             try {
-                LoginResult loginResult = serverFacade.login(new LoginData(params[0], params[1]));
+                LoginResult loginResult = facade().login(new LoginData(params[0], params[1]));
                 authToken = loginResult.authToken();
                 loggedIn = true;
                 System.out.println("Logged in as " + params[0]);
@@ -98,7 +106,7 @@ public class Client {
         }
         if (params.length == 3) {
             try {
-                LoginResult loginResult = serverFacade.register(new UserData(params[0], params[1], params[2]));
+                LoginResult loginResult = facade().register(new UserData(params[0], params[1], params[2]));
                 authToken = loginResult.authToken();
                 System.out.println("registered " + params[0]);
                 loggedIn = true;
@@ -127,7 +135,7 @@ public class Client {
             }
         }
         try {
-            serverFacade.createGame(authToken, new CreateGameData(gameName));
+            facade().createGame(authToken, new CreateGameData(gameName));
             System.out.println("Created new game: " + gameName);
             return "";
         } catch (Exception e) {
@@ -139,7 +147,7 @@ public class Client {
     public String list() throws Exception {
         if (loggedIn) {
             try {
-                 GameLists gameLists = serverFacade.listGames(authToken);
+                 GameLists gameLists = facade().listGames(authToken);
                  for (int i = 0; i < gameLists.games().size(); i++) {
                      ListGameResult game = gameLists.games().get(i);
                      String blackUser = (game.blackUsername() == null) ? "<Empty>" : game.blackUsername();
@@ -187,7 +195,7 @@ public class Client {
                 playerColor = ChessGame.TeamColor.BLACK;
             }
             try {
-                serverFacade.join(authToken, new JoinGameData(playerColor, gameID));
+                facade().join(authToken, new JoinGameData(playerColor, gameID));
                 System.out.println("joined a game as " + params[1] + " player.");
                 printBoard(new ChessGame(), params[1]);
                 return "";
@@ -230,7 +238,7 @@ public class Client {
             throw new Exception("You are not logged in");
         } else {
             try {
-                serverFacade.logout(authToken);
+                facade().logout(authToken);
                 loggedIn = false;
                 System.out.println("Logged out");
                 return "logout";
