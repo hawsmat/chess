@@ -9,7 +9,7 @@ public class Main {
         try {
             new Client(serverUrl).run();
         } catch (Throwable ex ){
-            System.out.printf("unable to start server: %s", ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
