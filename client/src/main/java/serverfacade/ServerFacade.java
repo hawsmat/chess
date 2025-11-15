@@ -64,7 +64,6 @@ public class ServerFacade {
 
     public void join(String authToken, JoinGameData joinGameData) throws Exception {
         Map<String, String> headers = Map.of("authorization", authToken);
-//        Map<String, Object> body = Map.of("playerColor", joinGameData.playerColor(), "gameID", joinGameData.gameID());
         HttpRequest request = buildRequest("PUT", "/game", headers, joinGameData);
         HttpResponse<String> response = sendRequest(request);
         handleResponse(response, null);

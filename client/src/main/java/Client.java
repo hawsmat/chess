@@ -226,6 +226,14 @@ public class Client {
                 throw new Exception("That game ID does not exist");
             }
             try {
+                GameLists gameLists = facade().listGames(authToken);
+                if (gameID > gameLists.games().size()) {
+                    throw new Exception("GameID does not exist");
+                }
+                ListGameResult game = gameLists.games().get(gameID);
+                if (game == null) {
+                    throw new Exception("GameID does not exist");
+                }
                 printBoard(new ChessGame(), ChessGame.TeamColor.WHITE);
                 return "";
             } catch (Exception e) {
