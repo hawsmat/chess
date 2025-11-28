@@ -199,7 +199,7 @@ public class Client {
             try {
                 facade().join(authToken, new JoinGameData(playerColor, gameID));
                 System.out.println("joined a game as " + playerColor + " player.");
-                printBoard(new ChessGame(), playerColor);
+                new PrintBoard(new ChessGame(), playerColor, null);
                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -234,7 +234,7 @@ public class Client {
                 if (game == null) {
                     throw new Exception("GameID does not exist");
                 }
-                printBoard(new ChessGame(), ChessGame.TeamColor.WHITE);
+                new PrintBoard(new ChessGame(), ChessGame.TeamColor.WHITE, null);
                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -288,84 +288,5 @@ public class Client {
     public void getStatus() {
         if (loggedIn) {System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED IN] ");}
         else {System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED OUT] ");}
-    }
-
-    public void printBoard(ChessGame game, ChessGame.TeamColor color) {
-        int initial;
-        int direction;
-        int end;
-        if (color.equals(ChessGame.TeamColor.WHITE)) {
-            initial = 1;
-            direction = 1;
-            end = 9;
-        }
-        else {
-            initial = 8;
-            direction = -1;
-            end = 0;
-        }
-        List<String> cols = List.of("a", "b", "c", "d", "e", "f", "g", "h");
-        List<String> rows = List.of("8", "7", "6", "5", "4", "3", "2", "1");
-        printCols(cols, initial, direction, end);
-        System.out.println();
-        for (int i = initial; i != end; i += direction) {
-            System.out.print(rows.get(i-1) + " ");
-            for (int j = initial; j != end; j += direction) {
-                if (game.getBoard().getPiece(new ChessPosition(i, j)) == null) {
-                    getBlankSpace(i, j);
-                } else {
-                    printPiece(i, j, game.getBoard().getPiece(new ChessPosition(i, j)));
-                }
-            }
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.RESET_BG_COLOR + " " +rows.get(i-1));
-        }
-        printCols(cols, initial, direction, end);
-        System.out.println();
-    }
-
-    public void getBlankSpace(int i, int j) {
-        if ((i + j) % 2 == 0) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   ");
-        } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + "   ");
-        }
-    }
-
-    public void printPiece(int i, int j, ChessPiece chessPiece) {
-        String piece;
-        String color;
-        if (chessPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            color = EscapeSequences.SET_TEXT_COLOR_RED;
-            piece = switch (chessPiece.getPieceType()) {
-                case ROOK -> EscapeSequences.BLACK_ROOK;
-                case QUEEN -> EscapeSequences.BLACK_QUEEN;
-                case KING -> EscapeSequences.BLACK_KING;
-                case BISHOP -> EscapeSequences.BLACK_BISHOP;
-                case PAWN -> EscapeSequences.BLACK_PAWN;
-                case KNIGHT -> EscapeSequences.BLACK_KNIGHT;
-            };
-        } else {
-            color = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY;
-            piece = switch (chessPiece.getPieceType()) {
-                case ROOK -> EscapeSequences.WHITE_ROOK;
-                case QUEEN -> EscapeSequences.WHITE_QUEEN;
-                case KING -> EscapeSequences.WHITE_KING;
-                case BISHOP -> EscapeSequences.WHITE_BISHOP;
-                case PAWN -> EscapeSequences.WHITE_PAWN;
-                case KNIGHT -> EscapeSequences.WHITE_KNIGHT;
-            };
-        }
-        if ((i + j) % 2 == 0) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + color + piece);
-        } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + color + piece);
-        }
-    }
-
-    public void printCols(List<String> cols, int initial, int direction, int end) {
-        System.out.print("  ");
-        for (int i = initial; i != end; i+=direction) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + cols.get(i-1) + " ");
-        }
     }
 }

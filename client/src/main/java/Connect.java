@@ -101,6 +101,7 @@ public class Connect {
     }
 
     public String redraw(String[] params) throws Exception {
+        new PrintBoard(game, color, null);
         return "";
     }
 
@@ -111,6 +112,7 @@ public class Connect {
     public String highlight(String[] params) throws Exception {
         if (params.length == 1) {
             ChessPosition chessPosition = convertToChessPosition(params[0]);
+            new PrintBoard(game, color, chessPosition);
             return "";
         } else {
             throw new Exception("Expected: {position}");
