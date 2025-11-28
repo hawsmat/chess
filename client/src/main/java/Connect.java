@@ -87,7 +87,13 @@ public class Connect {
         if (params.length == 2) {
             ChessPosition startPosition = convertToChessPosition(params[0]);
             ChessPosition endPosition = convertToChessPosition(params[1]);
-            new ChessMove(startPosition, endPosition, null);
+            ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+            if (moveAllowed(startPosition, chessMove)) {
+                game.makeMove(chessMove);
+            }
+            else {
+                throw new Exception("that move is not allowed");
+            }
             return "";
         } else {
             throw new Exception("Expected: {start position} {end position}");
@@ -109,6 +115,18 @@ public class Connect {
         } else {
             throw new Exception("Expected: {position}");
         }
+    }
+
+    public boolean moveAllowed(ChessPosition startPosition, ChessMove chessMove) {
+        if (game.getBoard().getPiece(startPosition).getTeamColor() != color) {
+            return false;
+        }
+        for (ChessMove move : game.validMoves(startPosition)) {
+            if (move.equals(chessMove)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public ChessPosition convertToChessPosition(String string) throws Exception {
