@@ -17,15 +17,16 @@ public class PrintBoard {
         int end;
         this.position=position;
         if (color.equals(ChessGame.TeamColor.WHITE)) {
-            initial = 1;
-            direction = 1;
-            end = 9;
-        }
-
-        else {
             initial = 8;
             direction = -1;
             end = 0;
+        }
+
+        else {
+            initial = 1;
+            direction = 1;
+            end = 9;
+
         }
 
         List<String> cols = List.of("a", "b", "c", "d", "e", "f", "g", "h");
@@ -33,7 +34,7 @@ public class PrintBoard {
         printCols(cols, initial, direction, end);
         System.out.println();
         for (int i = initial; i != end; i += direction) {
-            System.out.print(rows.get(i-1) + " ");
+            System.out.print(rows.get(7-(i-1)) + " ");
             for (int j = initial; j != end; j += direction) {
                 if (game.getBoard().getPiece(new ChessPosition(i, j)) == null) {
                     getBlankSpace(i, j);
@@ -90,7 +91,7 @@ public class PrintBoard {
     public void printCols(List<String> cols, int initial, int direction, int end) {
         System.out.print("  ");
         for (int i = initial; i != end; i+=direction) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + cols.get(i-1) + " ");
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + cols.get(7-(i-1)) + " ");
         }
     }
 

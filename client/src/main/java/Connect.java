@@ -123,6 +123,7 @@ public class Connect {
         if (game.getBoard().getPiece(startPosition).getTeamColor() != color) {
             return false;
         }
+
         for (ChessMove move : game.validMoves(startPosition)) {
             if (move.equals(chessMove)) {
                 return true;
@@ -143,16 +144,18 @@ public class Connect {
             case 'h' -> 8;
             default -> throw new Exception("column does not exist");
         };
+
         int row;
         try {
-            row = 9 - Integer.parseInt(String.valueOf(string.charAt(1)));
+            row = Integer.parseInt(String.valueOf(string.charAt(1)));
         } catch (Exception e) {
             throw new Exception("row needs to be a number");
         }
+
         if (row > 8 || row < 1) {
             throw new Exception("row does not exist");
         }
+
         return new ChessPosition(row, col);
     }
-
 }
