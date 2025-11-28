@@ -10,8 +10,8 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 
 public class ServerFacade {
-    private HttpClient client = HttpClient.newHttpClient();
-    private String serverUrl;
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final String serverUrl;
     public ServerFacade(String url) {
         serverUrl = url;
     }
@@ -68,8 +68,6 @@ public class ServerFacade {
         HttpResponse<String> response = sendRequest(request);
         handleResponse(response, null);
     }
-
-    public void observe() throws Exception {}
 
     private HttpRequest buildRequest(String method, String path, Map<String, String> headers, Object body) {
         var request = HttpRequest.newBuilder()

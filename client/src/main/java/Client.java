@@ -283,7 +283,6 @@ public class Client {
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "logout" + EscapeSequences.RESET_TEXT_COLOR +
                     EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " - log out of the chess server");
         }
-
     }
 
     public void getStatus() {
