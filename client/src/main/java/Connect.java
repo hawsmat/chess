@@ -1,4 +1,6 @@
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import serverfacade.ServerFacade;
 import ui.EscapeSequences;
 
@@ -83,6 +85,9 @@ public class Connect {
 
     public String move(String[] params) throws Exception {
         if (params.length == 2) {
+            ChessPosition startPosition = convertToChessPosition(params[0]);
+            ChessPosition endPosition = convertToChessPosition(params[1]);
+            new ChessMove(startPosition, endPosition, null);
             return "";
         } else {
             throw new Exception("Expected: {start position} {end position}");
@@ -99,10 +104,35 @@ public class Connect {
 
     public String highlight(String[] params) throws Exception {
         if (params.length == 1) {
+            ChessPosition chessPosition = convertToChessPosition(params[0]);
             return "";
         } else {
             throw new Exception("Expected: {position}");
         }
+    }
+
+    public ChessPosition convertToChessPosition(String string) throws Exception {
+        int col = switch (string.charAt(0)) {
+            case 'a' -> 1;
+            case 'b' -> 2;
+            case 'c' -> 3;
+            case 'd' -> 4;
+            case 'e' -> 5;
+            case 'f' -> 6;
+            case 'g' -> 7;
+            case 'h' -> 8;
+            default -> throw new Exception("column does not exist");
+        };
+        int row;
+        try {
+            row = Integer.parseInt(String.valueOf(string.charAt(1)));
+        } catch (Exception e) {
+            throw new Exception("row needs to be a number");
+        }
+        if (row > 8 || row < 1) {
+            throw new Exception("row does not exist");
+        }
+        return new ChessPosition(row, col);
     }
 
 }
