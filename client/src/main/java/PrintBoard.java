@@ -15,6 +15,7 @@ public class PrintBoard {
         int initial;
         int direction;
         int end;
+        this.position=position;
         if (color.equals(ChessGame.TeamColor.WHITE)) {
             initial = 1;
             direction = 1;
@@ -94,20 +95,27 @@ public class PrintBoard {
     }
 
     public void getBlankSpace(int i, int j) {
+        String positionColor = "";
         if (position != null) {
             for (ChessMove move : game.validMoves(position)) {
-                if (new ChessPosition(i, j).equals(move.getEndPosition())){
+                if (new ChessPosition(i, j).equals(move.getEndPosition())) {
                     System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + "   ");
-                    break;
+                    return;
                 }
+            }
+            if ((i + j) % 2 == 0) {
+                positionColor = EscapeSequences.SET_BG_COLOR_WHITE;
+            } else {
+                positionColor = EscapeSequences.SET_BG_COLOR_BLACK;
             }
         }
         else {
             if ((i + j) % 2 == 0) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + "   ");
+                positionColor = EscapeSequences.SET_BG_COLOR_WHITE;
             } else {
-                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + "   ");
+                positionColor = EscapeSequences.SET_BG_COLOR_BLACK;
             }
         }
+            System.out.print(positionColor + "   ");
     }
 }

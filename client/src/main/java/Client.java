@@ -230,7 +230,7 @@ public class Client {
                 if (gameID > gameLists.games().size()) {
                     throw new Exception("GameID does not exist");
                 }
-                ListGameResult game = gameLists.games().get(gameID);
+                ListGameResult game = gameLists.games().get(gameID-1);
                 if (game == null) {
                     throw new Exception("GameID does not exist");
                 }

@@ -145,7 +145,7 @@ public class Connect {
         };
         int row;
         try {
-            row = Integer.parseInt(String.valueOf(string.charAt(1)));
+            row = 9 - Integer.parseInt(String.valueOf(string.charAt(1)));
         } catch (Exception e) {
             throw new Exception("row needs to be a number");
         }
