@@ -112,6 +112,12 @@ public class Connect {
     public String highlight(String[] params) throws Exception {
         if (params.length == 1) {
             ChessPosition chessPosition = convertToChessPosition(params[0]);
+            if (game.getBoard().getPiece(chessPosition) == null) {
+                throw new Exception("That is not a piece");
+            }
+            else if (game.getBoard().getPiece(chessPosition).getTeamColor() != color) {
+                    throw new Exception("That is not your piece");
+            }
             new PrintBoard(game, color, chessPosition);
             return "";
         } else {

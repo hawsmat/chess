@@ -26,7 +26,6 @@ public class PrintBoard {
             initial = 1;
             direction = 1;
             end = 9;
-
         }
 
         List<String> cols = List.of("a", "b", "c", "d", "e", "f", "g", "h");
@@ -36,10 +35,10 @@ public class PrintBoard {
         for (int i = initial; i != end; i += direction) {
             System.out.print(rows.get(7-(i-1)) + " ");
             for (int j = initial; j != end; j += direction) {
-                if (game.getBoard().getPiece(new ChessPosition(i, j)) == null) {
-                    getBlankSpace(i, j);
+                if (game.getBoard().getPiece(new ChessPosition(i, 9-j)) == null) {
+                    getBlankSpace(i, 9-j);
                 } else {
-                    printPiece(i, j, game.getBoard().getPiece(new ChessPosition(i, j)));
+                    printPiece(i, j, game.getBoard().getPiece(new ChessPosition(i, 9-j)));
                 }
             }
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.RESET_BG_COLOR + " " +rows.get(i-1));
@@ -104,19 +103,19 @@ public class PrintBoard {
                     return;
                 }
             }
-            if ((i + j) % 2 == 0) {
+            if ((i + j+1) % 2 == 0) {
                 positionColor = EscapeSequences.SET_BG_COLOR_WHITE;
             } else {
                 positionColor = EscapeSequences.SET_BG_COLOR_BLACK;
             }
         }
         else {
-            if ((i + j) % 2 == 0) {
+            if ((i + j+1) % 2 == 0) {
                 positionColor = EscapeSequences.SET_BG_COLOR_WHITE;
             } else {
                 positionColor = EscapeSequences.SET_BG_COLOR_BLACK;
             }
         }
-            System.out.print(positionColor + "   ");
+            System.out.print(positionColor + "   " + EscapeSequences.RESET_BG_COLOR);
     }
 }
