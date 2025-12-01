@@ -197,18 +197,17 @@ public class Client {
                 playerColor = ChessGame.TeamColor.BLACK;
             }
             try {
-                facade().join(authToken, new JoinGameData(playerColor, gameID));
+                    facade().join(authToken, new JoinGameData(playerColor, gameID));
                 System.out.println("joined a game as " + playerColor + " player.");
-                new PrintBoard(new ChessGame(), playerColor, null);
+                new Connect(new ServerFacade(serverUrl), new ChessGame(), playerColor).run();
                 return "";
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                return e.getMessage();
             }
         }
         else {
             throw new Exception("Expected: white | black");
         }
-        return "failed";
     }
 
     public String observe(String[] params) throws Exception {

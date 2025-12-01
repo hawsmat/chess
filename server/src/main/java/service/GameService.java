@@ -3,10 +3,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
-import model.LoginResult;
-import model.CreateGameData;
-import model.JoinGameData;
-import model.ListGameResult;
+import model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,41 +38,48 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException,
-            UnauthorizedException, DataAccessException, Exception{
+            UnauthorizedException, DataAccessException, Exception {
         if (!dataAccess.isAuthorized(authToken)) {
             throw new UnauthorizedException("not authorized");
         }
-
-        LoginResult authdata = dataAccess.getAuthData(authToken);
-        if (authdata == null) {
+        LoginResult loginResult = dataAccess.getAuthData(authToken);
+        if (loginResult == null) {
             throw new UnauthorizedException("Invalid authToken");
         }
-
-        if (dataAccess.getGame(joinGameData.gameID()) == null) {
+        GameData gameData = dataAccess.getGame(joinGameData.gameID());
+        if (gameData == null) {
             throw new UnauthorizedException("gameID does not exist");
-
         }
-        if (joinGameData.playerColor() != ChessGame.TeamColor.WHITE &&
-                joinGameData.playerColor() != ChessGame.TeamColor.BLACK) {
+
+        String username = loginResult.username();
+        String whiteUsername = gameData.whiteUsername();
+        String blackUsername = gameData.blackUsername();
+
+        boolean whiteTaken = whiteUsername != null && !whiteUsername.equals(username);
+        boolean blackTaken = blackUsername != null && !blackUsername.equals(username);
+
+        if ((joinGameData.playerColor() != ChessGame.TeamColor.WHITE &&
+                joinGameData.playerColor() != ChessGame.TeamColor.BLACK)) {
             throw new Exception("bad color");
         }
+
         if (joinGameData.playerColor() == ChessGame.TeamColor.WHITE) {
-            if (dataAccess.getWhiteUsername(joinGameData.gameID()) == null) {
-                dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
-                        dataAccess.getAuthData(authToken).username());
-            }
-            else {
+            if (whiteTaken) {
                 throw new AlreadyTakenException("color already taken");
             }
+            if (username.equals(blackUsername)) {
+                throw new AlreadyTakenException("you joined as black");
+            }
+            dataAccess.updateUsernames(joinGameData.gameID(), ChessGame.TeamColor.WHITE, username);
         }
         else {
-            if (dataAccess.getBlackUsername(joinGameData.gameID()) == null) {
-                dataAccess.updateUsernames(joinGameData.gameID(), joinGameData.playerColor(),
-                        dataAccess.getAuthData(authToken).username());
-            }
-            else {
+            if (blackTaken) {
                 throw new AlreadyTakenException("color already taken");
             }
+            if (username.equals(whiteUsername)) {
+                throw new AlreadyTakenException("you joined as white");
+            }
+            dataAccess.updateUsernames(joinGameData.gameID(), ChessGame.TeamColor.BLACK, username);
         }
     }
 }

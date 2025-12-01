@@ -73,6 +73,16 @@ class GameServiceTestMySql {
     }
 
     @Test
+    void rejoinGame() {
+        UserData user = new UserData("matt", "joe", "email");
+        LoginResult loginResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult newLoginResult = assertDoesNotThrow(() -> userService.login(new LoginData(user.username(), user.password())) );
+        int gameID = assertDoesNotThrow(()-> gameService.createGame(loginResult.authToken(), new CreateGameData("game")));
+        assertDoesNotThrow(()-> gameService.joinGame(loginResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+        assertDoesNotThrow(()-> gameService.joinGame(newLoginResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
+    }
+
+    @Test
     void joinGameGameDoesntExist() {
         UserData user = new UserData("matt", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
@@ -83,10 +93,12 @@ class GameServiceTestMySql {
     @Test
     void joinGameColorAlreadyTaken() {
         UserData user = new UserData("matt", "joe", "email");
+        UserData user2 = new UserData("user", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult2 = assertDoesNotThrow(() -> userService.register(user2));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(registerResult.authToken(), new CreateGameData("game")));
         assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
-        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(registerResult.authToken(),
+        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(registerResult2.authToken(),
                 new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 }

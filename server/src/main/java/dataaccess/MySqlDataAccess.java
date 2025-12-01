@@ -142,10 +142,10 @@ public class MySqlDataAccess implements DataAccess {
                 return new GameData(rs.getInt("gameid"), rs.getString("whiteusername"),
                         rs.getString("blackusername"), rs.getString("gamename"), chessGame);
             }
+            return null;
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-        return null;
     }
 
     @Override
@@ -200,10 +200,11 @@ public class MySqlDataAccess implements DataAccess {
             if (rs.next()) {
                 return rs.getString("whiteusername");
             }
+            return null;
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-        throw new DataAccessException("something is very wrong with getWhiteUsername");
+//        throw new DataAccessException("something is very wrong with getWhiteUsername");
     }
 
     @Override
@@ -216,10 +217,11 @@ public class MySqlDataAccess implements DataAccess {
             if (rs.next()) {
                 return rs.getString("blackusername");
             }
+            return null;
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
-        throw new DataAccessException("somethign is wrong with getBlackUsername");
+//        throw new DataAccessException("somethign is wrong with getBlackUsername");
     }
 
     @Override

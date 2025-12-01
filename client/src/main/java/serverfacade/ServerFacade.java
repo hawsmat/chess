@@ -1,6 +1,7 @@
 package serverfacade;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import model.*;
 
 import java.net.URI;
@@ -106,7 +107,7 @@ public class ServerFacade {
         String body = response.body();
         if (status/100 != 2) {
             if (status == 401) {
-                throw new Exception("You are not authorized.");
+                throw new Exception("You are not authorized");
             }
             else if (status == 403) {
                 throw new Exception("That is already taken.");

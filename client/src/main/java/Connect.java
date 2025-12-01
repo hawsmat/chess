@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Connect {
-    public boolean inGame = true;
     public ServerFacade serverFacade;
     public ChessGame game;
     ChessGame.TeamColor color;
@@ -23,8 +22,8 @@ public class Connect {
         commands();
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("leave")) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + ">>> ");
+        while (true) {
+            System.out.print(EscapeSequences.RESET_TEXT_COLOR + "[IN GAME] "  + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + ">>> ");
             String line = scanner.nextLine();
             try {
                 result = evaluateInput(line);
@@ -33,8 +32,10 @@ public class Connect {
             }
             if (result.equals("help")) {
                 commands();
-            } else if (result.isEmpty()){
+            } else if (result.isEmpty()) {
                 System.out.println();
+            } else if (result.equals("leave")){
+                break;
             } else {
                 System.out.println(result);
                 commands();
@@ -84,15 +85,21 @@ public class Connect {
     }
 
     public String move(String[] params) throws Exception {
+        if (game.getTeamTurn() != color) {
+            throw new Exception("It is not your turn");
+        }
         if (params.length == 2) {
             ChessPosition startPosition = convertToChessPosition(params[0]);
             ChessPosition endPosition = convertToChessPosition(params[1]);
             ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
+            if (game.getBoard().getPiece(startPosition).getTeamColor() != color) {
+                throw new Exception("That piece is not yours");
+            }
             if (moveAllowed(startPosition, chessMove)) {
                 game.makeMove(chessMove);
             }
             else {
-                throw new Exception("that move is not allowed");
+                throw new Exception("That move is not allowed");
             }
             return "";
         } else {
@@ -126,10 +133,6 @@ public class Connect {
     }
 
     public boolean moveAllowed(ChessPosition startPosition, ChessMove chessMove) {
-        if (game.getBoard().getPiece(startPosition).getTeamColor() != color) {
-            return false;
-        }
-
         for (ChessMove move : game.validMoves(startPosition)) {
             if (move.equals(chessMove)) {
                 return true;

@@ -56,7 +56,8 @@ public class Server {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
                 ctx.status(500).json(str);
             } catch (AlreadyTakenException e) {
-                ctx.status(403).json("{\"message\": \"Error: bad request\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(403).json(str);
             }
         }
 
@@ -66,7 +67,8 @@ public class Server {
             try {
                 loginData = serializer.fromJson(ctx.body(), LoginData.class);
             } catch (Exception e) {
-                ctx.status(400).json("{\"message\": \"Error: bad request\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(400).json(str);
                 return;
             }
             if (loginData.username() == null || loginData.username().isEmpty() ||
@@ -81,7 +83,8 @@ public class Server {
                         registerResult.username(), registerResult.authToken());
                 ctx.status(200).result(str);
             } catch (UnauthorizedException e) {
-                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(401).result(str);
             } catch (DataAccessException e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
                 ctx.status(500).json(str);
@@ -101,7 +104,8 @@ public class Server {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
                 ctx.status(500).json(str);
             } catch (UnauthorizedException e) {
-                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(401).result(str);
             }
         }
 
@@ -116,7 +120,8 @@ public class Server {
                 String str = String.format("{\"games\": %s}", new Gson().toJson(games));
                 ctx.status(200).result(str);
             } catch (UnauthorizedException e) {
-                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(401).result(str);
             } catch (DataAccessException e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
                 ctx.status(500).result(str);
@@ -139,7 +144,7 @@ public class Server {
                 return;
             }
             if (gameName == null || gameName.isEmpty()) {
-                String str = String.format("{\"message\": \"Error: bad request\"}");
+                String str = "{\"message\": \"Error: bad request\"}";
                 ctx.status(400).json(str);
                 return;
             }
@@ -149,7 +154,8 @@ public class Server {
                 String str = String.format("{\"gameID\": %d}", gameID);
                 ctx.status(200).json(str);
             } catch (UnauthorizedException e) {
-                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(401).result(str);
             } catch (DataAccessException e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
                 ctx.status(500).json(str);
@@ -166,7 +172,8 @@ public class Server {
             try {
                 joinGameData = new Gson().fromJson(ctx.body(), JoinGameData.class);
             } catch (Exception e) {
-                ctx.status(400).json("{\"message\": \"Error: bad request\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(400).json(str);
                 return;
             }
             if (joinGameData == null || joinGameData.gameID() <=0 || joinGameData.playerColor() == null) {
@@ -183,7 +190,8 @@ public class Server {
             } catch (UnauthorizedException e) {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
             } catch (AlreadyTakenException e) {
-                ctx.status(403).json("{\"message\": \"Error: already taken\"}");
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(403).json(str);
             } catch (Exception e) {
                 String str = "{\"message\": \"Error: internal server error\"}";
                 ctx.status(500).json(str);
