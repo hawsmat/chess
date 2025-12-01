@@ -22,7 +22,7 @@ public class GameService {
                 ListGameResult listGameResult = new ListGameResult(gameID,
                         dataAccess.getWhiteUsername(gameID),
                         dataAccess.getBlackUsername(gameID),
-                        dataAccess.getGameName(gameID));
+                        dataAccess.getGameName(gameID), dataAccess.getChessGame(gameID));
                 gameData.add(listGameResult);
             }
             return gameData;
@@ -35,6 +35,17 @@ public class GameService {
             return dataAccess.addGame(createGameData.gameName());
         }
         throw new UnauthorizedException("not authorized");
+    }
+
+    public void updateGame(String authToken, int gameID, ChessGame game) throws AlreadyTakenException, DataAccessException, Exception {
+        if (!dataAccess.isAuthorized(authToken)) {
+            throw new UnauthorizedException("not authorized");
+        }
+        LoginResult loginResult = dataAccess.getAuthData(authToken);
+        if (loginResult == null) {
+            throw new UnauthorizedException("Invalid authToken");
+        }
+        dataAccess.updateGame(gameID, game);
     }
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws AlreadyTakenException,

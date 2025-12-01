@@ -39,7 +39,44 @@ public class Server {
         server.get("/game", this::listGames);
         server.post("/game", this::createGame);
         server.put("/game", this::joinGame);
+        server.put("/game", this::makeMove);
     }
+
+        private void makeMove(Context ctx) {
+            String authToken = ctx.header("authorization");
+            if (authToken == null || authToken.isEmpty()) {
+                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
+                return;
+            }
+            ChessMoveData chessMoveData;
+            try {
+                chessMoveData = new Gson().fromJson(ctx.body(), ChessMoveData.class);
+            } catch (Exception e) {
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(400).json(str);
+                return;
+            }
+            if (chessMoveData.game() == null) {
+                String str = "{\"message\": \"Error: bad request\"}";
+                ctx.status(400).json(str);
+                return;
+            }
+            try {
+                gameService.updateGame(authToken, chessMoveData.gameID(), chessMoveData.game());
+                ctx.status(200);
+            } catch (DataAccessException e) {
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(500).json(str);
+            } catch (UnauthorizedException e) {
+                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
+            } catch (AlreadyTakenException e) {
+                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
+                ctx.status(403).json(str);
+            } catch (Exception e) {
+                String str = "{\"message\": \"Error: internal server error\"}";
+                ctx.status(500).json(str);
+            }
+        }
 
         private void register (Context ctx) {
             var serializer = new Gson();

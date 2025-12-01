@@ -282,6 +282,20 @@ public class MySqlDataAccess implements DataAccess {
         }
     }
 
+    @Override
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE gamedata SET game=? WHERE gameid=?";
+            PreparedStatement ps = conn.prepareStatement(statement);
+            String gameData = new Gson().toJson(new ChessGame());
+            ps.setString(1, gameData);
+            ps.setInt(2, gameID);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS gamedata (

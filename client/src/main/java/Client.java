@@ -199,7 +199,7 @@ public class Client {
             try {
                     facade().join(authToken, new JoinGameData(playerColor, gameID));
                 System.out.println("joined a game as " + playerColor + " player.");
-                new Connect(new ServerFacade(serverUrl), new ChessGame(), playerColor).run();
+                new Connect(new ServerFacade(serverUrl), getGame(gameID-1), playerColor).run();
                 return "";
             } catch (Exception e) {
                 return e.getMessage();
@@ -287,5 +287,13 @@ public class Client {
     public void getStatus() {
         if (loggedIn) {System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED IN] ");}
         else {System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + "[LOGGED OUT] ");}
+    }
+
+    public ChessGame getGame(int gameID) {
+        try {
+            return facade().listGames(authToken).games().get(gameID).game();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

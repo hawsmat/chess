@@ -26,4 +26,5 @@ public interface DataAccess {
     ChessGame getChessGame(int gameID) throws DataAccessException;
     void clearGameData() throws DataAccessException;
     boolean isAuthorized(String authToken) throws DataAccessException;
+    void updateGame(int gameID, ChessGame game) throws DataAccessException;
 }
