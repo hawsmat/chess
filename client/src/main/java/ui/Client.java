@@ -1,12 +1,11 @@
+package ui;
+
 import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import ui.EscapeSequences;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import serverfacade.ServerFacade;
 import model.*;
+import serverfacade.ServerFacade;
+
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class Client {
     private boolean loggedIn = false;
@@ -199,7 +198,7 @@ public class Client {
             try {
                     facade().join(authToken, new JoinGameData(playerColor, gameID));
                 System.out.println("joined a game as " + playerColor + " player.");
-                new Connect(new ServerFacade(serverUrl), getGame(gameID-1), playerColor).run();
+                new Connect(new ServerFacade(serverUrl), getGame(gameID-1), playerColor, authToken, gameID).run();
                 return "";
             } catch (Exception e) {
                 return e.getMessage();

@@ -23,6 +23,13 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+    public void MakeMove(String authToken, MakeMoveData makeMoveData) throws Exception {
+        Map<String, String> headers = Map.of("authorization", authToken);
+        HttpRequest request = buildRequest("PUT", "/game/move", headers, makeMoveData);
+        HttpResponse<String> response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
     public LoginResult register(UserData userData) throws Exception {
         HttpRequest request = buildRequest("POST", "/user", null, userData);
         HttpResponse<String> response = sendRequest(request);

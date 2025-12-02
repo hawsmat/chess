@@ -287,7 +287,7 @@ public class MySqlDataAccess implements DataAccess {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "UPDATE gamedata SET game=? WHERE gameid=?";
             PreparedStatement ps = conn.prepareStatement(statement);
-            String gameData = new Gson().toJson(new ChessGame());
+            String gameData = new Gson().toJson(game);
             ps.setString(1, gameData);
             ps.setInt(2, gameID);
             ps.executeUpdate();

@@ -1,21 +1,33 @@
+package ui;
+
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
+import model.MakeMoveData;
 import serverfacade.ServerFacade;
-import ui.EscapeSequences;
+import websocket.NotificationHandler;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Connect {
+public class Connect implements NotificationHandler {
     public ServerFacade serverFacade;
     public ChessGame game;
     ChessGame.TeamColor color;
+    String authToken;
+    int gameID;
 
-    public Connect(ServerFacade serverFacade, ChessGame game, ChessGame.TeamColor color) {
+    @Override
+    public void notify(ServerMessage ) {
+
+    }
+
+    public Connect(ServerFacade serverFacade, ChessGame game, ChessGame.TeamColor color, String authToken, int gameID){
         this.serverFacade = serverFacade;
         this.game = game;
         this.color = color;
+        this.authToken = authToken;
+        this.gameID = gameID;
     }
 
     public void run() {
@@ -97,6 +109,7 @@ public class Connect {
             }
             if (moveAllowed(startPosition, chessMove)) {
                 game.makeMove(chessMove);
+                serverFacade.MakeMove(authToken, new MakeMoveData(gameID, game));
             }
             else {
                 throw new Exception("That move is not allowed");

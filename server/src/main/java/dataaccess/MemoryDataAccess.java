@@ -90,4 +90,10 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public boolean isAuthorized(String authToken) throws DataAccessException {return (getAuthData(authToken) != null);}
+
+    @Override
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        GameData gameData = gameDatas.get(gameID);
+        gameDatas.replace(gameID, gameData, new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
+    }
 }

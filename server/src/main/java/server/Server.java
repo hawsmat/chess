@@ -4,7 +4,6 @@ import dataaccess.*;
 import service.AdminService;
 import service.GameService;
 import service.UserService;
-import chess.ChessGame;
 import com.google.gson.Gson;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -39,7 +38,7 @@ public class Server {
         server.get("/game", this::listGames);
         server.post("/game", this::createGame);
         server.put("/game", this::joinGame);
-        server.put("/game", this::makeMove);
+        server.put("/game/move", this::makeMove);
     }
 
         private void makeMove(Context ctx) {
@@ -48,9 +47,9 @@ public class Server {
                 ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
                 return;
             }
-            ChessMoveData chessMoveData;
+            MakeMoveData chessMoveData;
             try {
-                chessMoveData = new Gson().fromJson(ctx.body(), ChessMoveData.class);
+                chessMoveData = new Gson().fromJson(ctx.body(), MakeMoveData.class);
             } catch (Exception e) {
                 String str = String.format("{\"message\": \"Error: (%s)\"}", e);
                 ctx.status(400).json(str);
