@@ -17,10 +17,10 @@ public class Connect implements NotificationHandler {
     String authToken;
     int gameID;
 
-    @Override
-    public void notify(ServerMessage ) {
-
-    }
+//    @Override
+//    public void notify(ServerMessage serverMessage) {
+//
+//    }
 
     public Connect(ServerFacade serverFacade, ChessGame game, ChessGame.TeamColor color, String authToken, int gameID){
         this.serverFacade = serverFacade;

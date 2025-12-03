@@ -1,8 +1,8 @@
 package websocketmessages;
 
-import usergamecommands.UserGameCommand;
+public class Notification extends ServerMessage {
 
-public class Notification extends ServerMessages {
-
-
+    public Notification(ServerMessageType type) {
+        super(type);
+    }
 }
