@@ -1,11 +1,10 @@
 package client.websocket;
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.server.Server;
-import webSocketMessages.Action;
-import webSocketMessages.Notification;
-
 import jakarta.websocket.*;
+import websocketmessages.Notification;
+
+
 import websocket.NotificationHandler;
 import websocket.ServerMessage;
 
@@ -13,7 +12,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-    //need to extend Endpoint for websocket to work properly
 public class WebSocketFacade extends Endpoint {
 
     Session session;
@@ -38,15 +36,6 @@ public class WebSocketFacade extends Endpoint {
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new Exception("There was an exception");
-        }
-    }
-
-    private void handleMessage(String message) {
-        try {
-            ServerMessage message = Serializer.fromJson(messageString, ServerMessage.class);
-            listener.notify(message);
-        } catch (Exception e) {
-            listener.notify(new ErrorMessage(ex.getMessage()));
         }
     }
 

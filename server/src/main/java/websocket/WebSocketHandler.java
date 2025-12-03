@@ -12,14 +12,15 @@ import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import webSocketMessages.Action;
 import webSocketMessages.Notification;
-import websocket.commands.UserGameCommand;
+import websocket.ConnectionManager;
+import websocket.commands.*;
 
 import java.io.IOException;
 import java.nio.file.attribute.UserPrincipal;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
-    private final server.websocket.ConnectionManager connections = new server.websocket.ConnectionManager();
+    private final ConnectionManager connections = new ConnectionManager();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -39,10 +40,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             saveSession(gameID, session);
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, (ConnectCommand) command);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
-                case LEAVE -> leaveGame(session, username, (LeaveGameCommand) command);
-                case RESIGN -> resign(session, username, (ResignCommand) command);
+                case CONNECT -> connect(session, username, (Connect) command);
+                case MAKE_MOVE -> makeMove(session, username, (MakeMove) command);
+                case LEAVE -> leaveGame(session, username, (Leave) command);
+                case RESIGN -> resign(session, username, (Resign) command);
             }
         } catch (UnauthorizedException e) {
             sendMessage(session, gameID, new ErrorMessage("Error: " + e.getMessage()));
@@ -52,6 +53,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
 
     }
+
+    public void connect(Session session, String username, Connect command){}
+    public void makeMove(Session session, String username, MakeMove command){}
+    public void leaveGame(Session session, String username, Leave command){}
+    public void resign(Session session, String username, Resign command){}
 
     @Override
     public void handleClose(WsCloseContext ctx) {

@@ -1,7 +1,7 @@
-package server.websocket;
+package websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
-import webSocketMessages.Notification;
+import websocketmessages.Notification;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ public class ConnectionManager {
         connections.remove(session);
     }
 
-    public void broadcast(Session excludeSession, webSocketMessages.Notification notification) throws IOException {
+    public void broadcast(Session excludeSession, Notification notification) throws IOException {
         String msg = notification.toString();
-        for (Session c : connections.values()) {
+        for (Session c : connections.keySet()) {
             if (c.isOpen()) {
                 if (!c.equals(excludeSession)) {
                     c.getRemote().sendString(msg);
