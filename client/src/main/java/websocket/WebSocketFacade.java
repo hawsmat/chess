@@ -5,6 +5,7 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
+import org.eclipse.jetty.http.HttpTester;
 import websocketmessages.ServerMessage;
 
 import java.io.IOException;
@@ -39,9 +40,17 @@ public class WebSocketFacade extends Endpoint {
     private void handleMessage(String messageString) {
         try {
             ServerMessage message = Serializer.fromJson(messageString, ServerMessage.class);
-            listener.notify(message);
+            if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                return;
+            }
+            else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                return;
+            }
+            else if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                return;
+            }
         } catch (Exception e) {
-            listener.notify(e.getMessage());
+            System.out.println("");
         }
     }
         //Endpoint requires this method, but you don't have to do anything

@@ -233,7 +233,9 @@ public class Client {
                 if (game == null) {
                     throw new Exception("GameID does not exist");
                 }
-                new PrintBoard(new ChessGame(), ChessGame.TeamColor.WHITE, null);
+                serverFacade.connectWebSocket();
+                serverFacade.join(authToken, new JoinGameData(null, gameID-1));
+                new Connect(serverFacade, getGame(gameID-1), null, authToken).run();
                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());

@@ -2,8 +2,7 @@ package serverfacade;
 
 import com.google.gson.Gson;
 import model.*;
-import usergamecommands.MakeMove;
-import usergamecommands.UserGameCommand;
+import commands.UserGameCommand;
 import websocket.WebSocketFacade;
 
 import java.net.URI;
@@ -29,6 +28,7 @@ public class ServerFacade {
 
     public void sendCommand(UserGameCommand userGameCommand) {
         String command = new Gson().toJson(userGameCommand);
+        webSocketFacade.sendCommand(command);
     }
 
     public LoginResult register(UserData userData) throws Exception {

@@ -1,4 +1,4 @@
-package usergamecommands;
+package commands;
 
 import java.util.Objects;
 

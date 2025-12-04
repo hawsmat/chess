@@ -4,7 +4,6 @@ import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
@@ -14,16 +13,13 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
-import usergamecommands.Connect;
-import usergamecommands.Leave;
-import usergamecommands.MakeMove;
-import usergamecommands.UserGameCommand;
-import usergamecommands.*;
+import commands.Connect;
+import commands.Leave;
+import commands.MakeMove;
+import commands.UserGameCommand;
+import commands.*;
 import websocketmessages.Error;
 import websocketmessages.Notification;
-import websocketmessages.ServerMessage;
-
-import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     DataAccess dataAccess;
@@ -54,10 +50,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             saveSession(gameID, session);
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, (Connect) command);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMove) command);
-                case LEAVE -> leaveGame(session, username, (Leave) command);
-                case RESIGN -> resign(session, username, (Resign) command);
+                case CONNECT -> {
+                        Connect connect = Serializer.fromJson(ctx.message(), Connect.class);
+                        connect(session, username, connect);
+                }
+                case MAKE_MOVE -> {
+                    MakeMove move = Serializer.fromJson(ctx.message(), MakeMove.class);
+                    makeMove(session, username, move);
+                }
+                case LEAVE -> {
+                    Leave leave = Serializer.fromJson(ctx.message(), Leave.class);
+                    leaveGame(session, username, leave);
+                }
+                case RESIGN -> {
+                    Resign resign = Serializer.fromJson(ctx.message(), Resign.class);
+                    resign(session, username, resign);
+                }
             }
         } catch (UnauthorizedException e) {
             sendError(session, new Error("Error: " + e.getMessage()));
@@ -145,6 +153,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void sendError(Session session, Error error) throws Exception {
         if (session.isOpen()) {
             session.getRemote().sendString(error.message());
+        }
+    }
+
+    public void sendMessage(Session session, Notification notification) throws Exception {
+        if (session.isOpen()) {
+            session.getRemote().sendString(notification.message());
         }
     }
 

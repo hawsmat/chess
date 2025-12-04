@@ -4,12 +4,12 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import serverfacade.ServerFacade;
-import usergamecommands.*;
+import commands.*;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Connect implements  ServerMessageObserver {
+public class Connect {
     public ServerFacade serverFacade;
     public ChessGame game;
     ChessGame.TeamColor color;
