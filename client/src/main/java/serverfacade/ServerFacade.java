@@ -29,7 +29,6 @@ public class ServerFacade {
 
     public void sendCommand(UserGameCommand userGameCommand) {
         String command = new Gson().toJson(userGameCommand);
-        webSocketFacade.sendMessage(command);
     }
 
     public LoginResult register(UserData userData) throws Exception {

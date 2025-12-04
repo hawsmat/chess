@@ -18,6 +18,7 @@ import usergamecommands.Leave;
 import usergamecommands.MakeMove;
 import usergamecommands.UserGameCommand;
 import usergamecommands.*;
+import websocketmessages.Error;
 import websocketmessages.Notification;
 import websocketmessages.ServerMessage;
 
@@ -58,9 +59,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case RESIGN -> resign(session, username, (Resign) command);
             }
         } catch (UnauthorizedException e) {
-            sendMessage(session, gameID, new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Error: " + e.getMessage()));
+            sendMessage(session, gameID, new Error("Error: " + e.getMessage()));
         } catch (Exception e) {
-            sendMessage(session, gameID, new ServerMessage(ServerMessage.ServerMessageType.ERROR, "error: " + e.getMessage()));
+            sendMessage(session, gameID, new Error("error: " + e.getMessage()));
         }
     }
 
@@ -71,7 +72,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void connect(Session session, String username, Connect command){
         connections.add(session, command.getGameID());
         String message = String.format("%s has joined the game", username);
-        Notification notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        Notification notification = new Notification(message);
         try {
             connections.broadcast(session, notification);
         } catch (IOException e) {
@@ -109,13 +110,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (move.equals(moves)) {
                 game.makeMove(move);
                 dataAccess.updateGame(command.getGameID(), game);
+                String message = String.format("%s made move %s %s", username, move.getStartPosition().toString(), move.getEndPosition().toString());
+                sendMessage(session, command.getGameID(), new Notification(message));
                 return;
             }
         }
         throw new Exception("That move is not valid, or you did not include a promotion");
     }
 
-    public void leaveGame(Session session, String username, Leave command) throws Exception {}
+    public void leaveGame(Session session, String username, Leave command) throws Exception {
+        ChessGame game = dataAccess.getChessGame(command.getGameID());
+        String authToken = command.getAuthToken();
+        connections.remove(session);
+    }
     public void resign(Session session, String username, Resign command) throws Exception {}
     public void sendMessage(Session session, int gameID, ServerMessage serverMessage) throws Exception {}
 

@@ -68,4 +68,6 @@ public class ChessMove {
         var promotionCode = (promotionPiece == null ? 9 : promotionPiece.ordinal());
             return (71 * startPosition.hashCode()) + endPosition.hashCode() + promotionCode;
     }
+
+
 }
