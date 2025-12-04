@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
@@ -59,9 +60,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case RESIGN -> resign(session, username, (Resign) command);
             }
         } catch (UnauthorizedException e) {
-            sendMessage(session, gameID, new Error("Error: " + e.getMessage()));
+            sendError(session, new Error("Error: " + e.getMessage()));
         } catch (Exception e) {
-            sendMessage(session, gameID, new Error("error: " + e.getMessage()));
+            sendError(session, new Error("error: " + e.getMessage()));
         }
     }
 
@@ -71,13 +72,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     public void connect(Session session, String username, Connect command){
         connections.add(session, command.getGameID());
-        String message = String.format("%s has joined the game", username);
-        Notification notification = new Notification(message);
         try {
-            connections.broadcast(session, notification);
-        } catch (IOException e) {
+            if (!dataAccess.getWhiteUsername(command.getGameID()).equals(username) && !dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
+                String message = String.format("%s is observing the game", username);
+                Notification notification = new Notification(message);
+                connections.broadcast(command.getGameID(), session, notification);
+                return;
+            }
+            String message = String.format("%s has joined the game", username);
+            Notification notification = new Notification(message);
+            connections.broadcast(command.getGameID(), session, notification);
+        } catch (Exception e) {
             throw new RuntimeException(e);
-        }
+            }
     }
 
     public void makeMove(Session session, String username, MakeMove command) throws Exception {
@@ -92,39 +99,54 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             color = ChessGame.TeamColor.WHITE;
         }
         else {
-            throw new Exception("You are observing");
+            sendError(session, new Error("You are observing"));
+            return;
         }
         if (!dataAccess.isAuthorized(authToken)) {
-            throw new Exception("You are not authorized");
+            sendError(session, new Error("You are not authorized"));
+            return;
         }
         if (move.getStartPosition() == null) {
-            throw new Exception("That game is Illegal");
+            sendError(session, new Error("That game is not allowed"));
+            return;
         }
         if (game.getTeamTurn() != color) {
-            throw new Exception("It is not your turn");
+            sendError(session, new Error("It is not your turn"));
+            return;
         }
         if (game.getBoard().getPiece(move.getStartPosition()).getTeamColor() != color) {
-            throw new Exception("That is not your piece");
+            sendError(session, new Error("That is not your piece"));
+            return;
         }
         for (ChessMove moves : game.validMoves(move.getStartPosition())) {
             if (move.equals(moves)) {
                 game.makeMove(move);
                 dataAccess.updateGame(command.getGameID(), game);
                 String message = String.format("%s made move %s %s", username, move.getStartPosition().toString(), move.getEndPosition().toString());
-                sendMessage(session, command.getGameID(), new Notification(message));
+                connections.broadcast(command.getGameID(), session, new Notification(message));
                 return;
             }
         }
-        throw new Exception("That move is not valid, or you did not include a promotion");
+        sendError(session, new Error("That move is not valid, or you did not include a promotion"));
     }
 
     public void leaveGame(Session session, String username, Leave command) throws Exception {
-        ChessGame game = dataAccess.getChessGame(command.getGameID());
         String authToken = command.getAuthToken();
-        connections.remove(session);
+        if (dataAccess.isAuthorized(authToken)) {
+            connections.remove(command.getGameID(), session);
+        }
+        else {
+            sendError(session, new Error("You are not authorized"));
+        }
     }
+
     public void resign(Session session, String username, Resign command) throws Exception {}
-    public void sendMessage(Session session, int gameID, ServerMessage serverMessage) throws Exception {}
+
+    public void sendError(Session session, Error error) throws Exception {
+        if (session.isOpen()) {
+            session.getRemote().sendString(error.message());
+        }
+    }
 
     @Override
     public void handleClose(WsCloseContext ctx) {
