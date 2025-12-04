@@ -3,31 +3,24 @@ package ui;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
-import model.MakeMoveData;
 import serverfacade.ServerFacade;
-import websocket.NotificationHandler;
+import usergamecommands.*;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Connect implements NotificationHandler {
+public class Connect implements  ServerMessageObserver {
     public ServerFacade serverFacade;
     public ChessGame game;
     ChessGame.TeamColor color;
     String authToken;
     int gameID;
 
-//    @Override
-//    public void notify(ServerMessage serverMessage) {
-//
-//    }
-
-    public Connect(ServerFacade serverFacade, ChessGame game, ChessGame.TeamColor color, String authToken, int gameID){
+    public Connect(ServerFacade serverFacade, ChessGame game, ChessGame.TeamColor color, String authToken){
         this.serverFacade = serverFacade;
         this.game = game;
         this.color = color;
         this.authToken = authToken;
-        this.gameID = gameID;
     }
 
     public void run() {
@@ -97,23 +90,11 @@ public class Connect implements NotificationHandler {
     }
 
     public String move(String[] params) throws Exception {
-        if (game.getTeamTurn() != color) {
-            throw new Exception("It is not your turn");
-        }
         if (params.length == 2) {
             ChessPosition startPosition = convertToChessPosition(params[0]);
             ChessPosition endPosition = convertToChessPosition(params[1]);
             ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
-            if (game.getBoard().getPiece(startPosition).getTeamColor() != color) {
-                throw new Exception("That piece is not yours");
-            }
-            if (moveAllowed(startPosition, chessMove)) {
-                game.makeMove(chessMove);
-                serverFacade.MakeMove(authToken, new MakeMoveData(gameID, game));
-            }
-            else {
-                throw new Exception("That move is not allowed");
-            }
+            serverFacade.sendCommand(new MakeMove(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, chessMove));
             return "";
         } else {
             throw new Exception("Expected: {start position} {end position}");
@@ -143,15 +124,6 @@ public class Connect implements NotificationHandler {
         } else {
             throw new Exception("Expected: {position}");
         }
-    }
-
-    public boolean moveAllowed(ChessPosition startPosition, ChessMove chessMove) {
-        for (ChessMove move : game.validMoves(startPosition)) {
-            if (move.equals(chessMove)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public ChessPosition convertToChessPosition(String string) throws Exception {

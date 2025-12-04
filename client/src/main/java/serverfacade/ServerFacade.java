@@ -1,8 +1,10 @@
 package serverfacade;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import model.*;
+import usergamecommands.MakeMove;
+import usergamecommands.UserGameCommand;
+import websocket.WebSocketFacade;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -13,6 +15,8 @@ import java.util.Map;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    WebSocketFacade webSocketFacade;
+
     public ServerFacade(String url) {
         serverUrl = url;
     }
@@ -23,11 +27,9 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public void MakeMove(String authToken, MakeMoveData makeMoveData) throws Exception {
-        Map<String, String> headers = Map.of("authorization", authToken);
-        HttpRequest request = buildRequest("PUT", "/game/move", headers, makeMoveData);
-        HttpResponse<String> response = sendRequest(request);
-        handleResponse(response, null);
+    public void sendCommand(UserGameCommand userGameCommand) {
+        String command = new Gson().toJson(userGameCommand);
+        webSocketFacade.sendMessage(command);
     }
 
     public LoginResult register(UserData userData) throws Exception {
@@ -127,5 +129,13 @@ public class ServerFacade {
             return new Gson().fromJson(response.body(), responseClass);
         }
         return null;
+    }
+
+    public void connectWebSocket() {
+       try {
+           webSocketFacade = new WebSocketFacade(serverUrl);
+       } catch (Exception e) {
+           System.out.println("Could not connect to server");
+       }
     }
 }

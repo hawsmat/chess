@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import model.*;
 import serverfacade.ServerFacade;
+import websocket.*;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -196,9 +197,9 @@ public class Client {
                 playerColor = ChessGame.TeamColor.BLACK;
             }
             try {
-                    facade().join(authToken, new JoinGameData(playerColor, gameID));
-                System.out.println("joined a game as " + playerColor + " player.");
-                new Connect(new ServerFacade(serverUrl), getGame(gameID-1), playerColor, authToken, gameID).run();
+                serverFacade.connectWebSocket();
+                serverFacade.join(authToken, new JoinGameData(playerColor, gameID-1));
+                new Connect(serverFacade, getGame(gameID-1), playerColor, authToken).run();
                 return "";
             } catch (Exception e) {
                 return e.getMessage();

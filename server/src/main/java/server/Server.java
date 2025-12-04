@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import model.*;
+import websocket.WebSocketHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,12 @@ public class Server {
         adminService = new AdminService(dataAccess);
 
         server = Javalin.create(config -> config.staticFiles.add("web"));
-
+        WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess, GameService);
+        server.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
         server.delete("/db", this::clear);
         server.post("/user", this::register);
         server.post("/session", this::login);
@@ -38,44 +44,7 @@ public class Server {
         server.get("/game", this::listGames);
         server.post("/game", this::createGame);
         server.put("/game", this::joinGame);
-        server.put("/game/move", this::makeMove);
     }
-
-        private void makeMove(Context ctx) {
-            String authToken = ctx.header("authorization");
-            if (authToken == null || authToken.isEmpty()) {
-                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
-                return;
-            }
-            MakeMoveData chessMoveData;
-            try {
-                chessMoveData = new Gson().fromJson(ctx.body(), MakeMoveData.class);
-            } catch (Exception e) {
-                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
-                ctx.status(400).json(str);
-                return;
-            }
-            if (chessMoveData.game() == null) {
-                String str = "{\"message\": \"Error: bad request\"}";
-                ctx.status(400).json(str);
-                return;
-            }
-            try {
-                gameService.updateGame(authToken, chessMoveData.gameID(), chessMoveData.game());
-                ctx.status(200);
-            } catch (DataAccessException e) {
-                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
-                ctx.status(500).json(str);
-            } catch (UnauthorizedException e) {
-                ctx.status(401).result("{\"message\": \"Error: unauthorized\"}");
-            } catch (AlreadyTakenException e) {
-                String str = String.format("{\"message\": \"Error: (%s)\"}", e);
-                ctx.status(403).json(str);
-            } catch (Exception e) {
-                String str = "{\"message\": \"Error: internal server error\"}";
-                ctx.status(500).json(str);
-            }
-        }
 
         private void register (Context ctx) {
             var serializer = new Gson();

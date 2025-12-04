@@ -1,4 +1,4 @@
-package websocket.commands;
+package usergamecommands;
 
 public class Resign extends UserGameCommand {
     public Resign(CommandType commandType, String authToken, Integer gameID) {
