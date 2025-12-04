@@ -1,5 +1,8 @@
 package websocketmessages;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 public class Error extends ServerMessage {
     String message;
     public Error(String message) {
@@ -10,6 +13,7 @@ public class Error extends ServerMessage {
     public String message() {
         return this.message;
     }
+
 
     @Override
     public ServerMessageType getServerMessageType() {

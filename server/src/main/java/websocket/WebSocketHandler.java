@@ -19,7 +19,9 @@ import commands.MakeMove;
 import commands.UserGameCommand;
 import commands.*;
 import websocketmessages.Error;
+import websocketmessages.LoadGame;
 import websocketmessages.Notification;
+import websocketmessages.ServerMessage;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     DataAccess dataAccess;
@@ -78,18 +80,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.add(session, gameID);
     }
 
-    public void connect(Session session, String username, Connect command){
+    public void connect(Session session, String username, Connect command) {
         connections.add(session, command.getGameID());
         try {
             if (!dataAccess.getWhiteUsername(command.getGameID()).equals(username) && !dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
+                sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
                 String message = String.format("%s is observing the game", username);
                 Notification notification = new Notification(message);
                 connections.broadcast(command.getGameID(), session, notification);
-                return;
             }
-            String message = String.format("%s has joined the game", username);
-            Notification notification = new Notification(message);
-            connections.broadcast(command.getGameID(), session, notification);
+            else {
+                sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
+                String message = String.format("%s has joined the game", username);
+                Notification notification = new Notification(message);
+                connections.broadcast(command.getGameID(), session, notification);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
             }
@@ -156,9 +161,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    public void sendMessage(Session session, Notification notification) throws Exception {
+    public void sendMessage(Session session, ServerMessage serverMessage) throws Exception {
         if (session.isOpen()) {
-            session.getRemote().sendString(notification.message());
+            session.getRemote().sendString(new Gson().toJson(serverMessage));
         }
     }
 

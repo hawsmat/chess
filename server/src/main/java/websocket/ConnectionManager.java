@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocketmessages.LoadGame;
 import websocketmessages.Notification;
+import websocketmessages.ServerMessage;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,14 +27,13 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcast(int gameID, Session excludeSession, Notification notification) throws IOException {
-        String msg = notification.message();
+    public void broadcast(int gameID, Session excludeSession, ServerMessage serverMessage) throws IOException {
         if (connections.get(gameID) != null) {
             Set<Session> sessions = connections.get(gameID);
             for (Session c : sessions) {
                 if (c.isOpen()) {
                     if (!c.equals(excludeSession)) {
-                        c.getRemote().sendString(msg);
+                        c.getRemote().sendString(new Gson().toJson(serverMessage));
                     }
                 }
             }
