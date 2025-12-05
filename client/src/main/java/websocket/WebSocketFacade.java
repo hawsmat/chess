@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
 
     Session session;
-    Gson Serializer = new Gson();
+    Gson serializer = new Gson();
 
     public interface MessageListener {
         void onMessage(ServerMessage message);
@@ -42,7 +42,7 @@ public class WebSocketFacade extends Endpoint {
 
     private void handleMessage(String messageString) {
         try {
-            ServerMessage message = Serializer.fromJson(messageString, ServerMessage.class);
+            ServerMessage message = serializer.fromJson(messageString, ServerMessage.class);
             listener.onMessage(message);
         } catch (Exception e) {
             System.out.println("Could not parse message");
