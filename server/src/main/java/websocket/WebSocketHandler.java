@@ -166,35 +166,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     public void leaveGame(Session session, String username, Leave command) throws Exception {
         String authToken = command.getAuthToken();
-        ChessGame.TeamColor color;
-        if (dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
-            color = ChessGame.TeamColor.BLACK;
-        }
-        else if (dataAccess.getWhiteUsername(command.getGameID()).equals(username)) {
-            color = ChessGame.TeamColor.WHITE;
-        }
-        else {
-            sendMessage(session, new ErrorMessage("You are observing"));
-            return;
-        }
         if (!dataAccess.isAuthorized(authToken)) {
             sendMessage(session, new ErrorMessage("You are not authorized"));
             return;
         }
-        if (color == ChessGame.TeamColor.WHITE) {
-            sendMessage(session, new Notification("You Resigned! Black Won"));
+        if (dataAccess.getWhiteUsername(command.getGameID()) != null && dataAccess.getWhiteUsername(command.getGameID()).equals(username)) {
             dataAccess.updateUsernames(command.getGameID(), ChessGame.TeamColor.WHITE, null);
             connections.remove(command.getGameID(), session);
-            String message = String.format("%s resigned! Black won!", username);
+            String message = String.format("%s left!", username);
             connections.broadcast(command.getGameID(), session, new Notification(message));
+            return;
         }
-        else {
-            sendMessage(session, new Notification("You Resigned! White Won"));
+        else if (dataAccess.getBlackUsername(command.getGameID()) != null && dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
             dataAccess.updateUsernames(command.getGameID(), ChessGame.TeamColor.BLACK, null);
             connections.remove(command.getGameID(), session);
-            String message = String.format("%s resigned! White won!", username);
+            String message = String.format("%s left!", username);
             connections.broadcast(command.getGameID(), session, new Notification(message));
+            return;
         }
+        connections.remove(command.getGameID(), session);
+        String message = String.format("%s left!", username);
+        connections.broadcast(command.getGameID(), session, new Notification(message));
     }
 
     public void resign(Session session, String username, Resign command) throws Exception {
