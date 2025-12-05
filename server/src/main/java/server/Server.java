@@ -33,9 +33,9 @@ public class Server {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess, gameService);
         server.ws("/ws", ws -> {
-            ws.onConnect(webSocketHandler);
-            ws.onMessage(webSocketHandler);
-            ws.onClose(webSocketHandler);
+            ws.onConnect(webSocketHandler::handleConnect);
+            ws.onMessage(webSocketHandler::handleMessage);
+            ws.onClose(webSocketHandler::handleClose);
         });
         server.delete("/db", this::clear);
         server.post("/user", this::register);

@@ -129,12 +129,4 @@ public class ServerFacade {
         }
         return null;
     }
-
-    public void connectWebSocket() {
-       try {
-           webSocketFacade = new WebSocketFacade(serverUrl);
-       } catch (Exception e) {
-           System.out.println("Could not connect to server");
-       }
-    }
 }

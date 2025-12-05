@@ -2,9 +2,6 @@ package websocket;
 
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import websocketmessages.ErrorMessage;
-import websocketmessages.LoadGame;
-import websocketmessages.Notification;
 import websocketmessages.ServerMessage;
 
 import java.io.IOException;

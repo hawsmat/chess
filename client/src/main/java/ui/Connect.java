@@ -172,16 +172,19 @@ public class Connect implements WebSocketFacade.MessageListener {
     @Override
     public void onMessage(ServerMessage message) {
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
-            System.out.println(errorMessage);
+            ErrorMessage error = (ErrorMessage) message;
+            System.out.println("Error: " + error.message());
         }
         else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            Notification notification = new Gson().fromJson(message, Notification.class);
-            System.out.println(notification);
+            Notification notification = (Notification) message;
+            System.out.println(notification.message());
         }
         else if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            LoadGame loadGame = new Gson().fromJson(message, LoadGame.class);
-            System.out.println("Game has changed");
+            LoadGame loadGame = (LoadGame) message;
+            this.game = loadGame.getGame();
+        }
+        else {
+            System.out.println("Could not parse the message");
         }
     }
 }

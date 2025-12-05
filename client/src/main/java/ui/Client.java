@@ -196,9 +196,8 @@ public class Client {
                 playerColor = ChessGame.TeamColor.BLACK;
             }
             try {
-                serverFacade.connectWebSocket();
                 serverFacade.join(authToken, new JoinGameData(playerColor, gameID));
-                new Connect(serverFacade, getGame(gameID-1), playerColor, authToken).run();
+                new Connect(serverUrl, getGame(gameID-1), playerColor, authToken, gameID).run();
                 return "";
             } catch (Exception e) {
                 return e.getMessage();
@@ -232,9 +231,8 @@ public class Client {
                 if (game == null) {
                     throw new Exception("GameID does not exist");
                 }
-                serverFacade.connectWebSocket();
-                serverFacade.join(authToken, new JoinGameData(null, gameID-1));
-                new Connect(serverFacade, getGame(gameID-1), null, authToken).run();
+                serverFacade.join(authToken, new JoinGameData(null, gameID));
+                new Connect(serverUrl, getGame(gameID-1), null, authToken, gameID).run();
                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());

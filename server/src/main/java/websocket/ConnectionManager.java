@@ -15,6 +15,7 @@ public class ConnectionManager {
     public void add(Session session, int gameID) {
         if (connections.get(gameID) == null) {
             connections.put(gameID, new HashSet<Session>());
+            connections.get(gameID).add(session);
         }
         else {
             connections.get(gameID).add(session);

@@ -45,15 +45,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) throws Exception {
+    public void handleMessage(WsMessageContext ctx){
         int gameID = -1;
         Session session = ctx.session;
         try {
             UserGameCommand command = Serializer.fromJson(
                     ctx.message(), UserGameCommand.class);
             gameID = command.getGameID();
+            if (!dataAccess.isAuthorized(command.getAuthToken())) {
+                sendMessage(session, new ErrorMessage("You are not authorized"));
+                return;
+            }
             String username = dataAccess.getAuthData(command.getAuthToken()).username();
-            saveSession(gameID, session);
             switch (command.getCommandType()) {
                 case CONNECT -> {
                         Connect connect = Serializer.fromJson(ctx.message(), Connect.class);
@@ -83,10 +86,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.add(session, gameID);
     }
 
-    public void connect(Session session, String username, Connect command) {
-        connections.add(session, command.getGameID());
+    public void connect(Session session, String username, Connect command){
+        saveSession(command.getGameID(), session);
         try {
-            LoginResult loginResult = dataAccess.getAuthData(command.getAuthToken());
             GameData gameData = dataAccess.getGame(command.getGameID());
             if (!dataAccess.isAuthorized(command.getAuthToken())) {
                 sendMessage(session, new ErrorMessage("You are not authorized"));
@@ -111,8 +113,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcast(command.getGameID(), session, notification);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
-            }
+            sendMessage(session, new ErrorMessage(e.getMessage()));
+        }
     }
 
     public void makeMove(Session session, String username, MakeMove command) throws Exception {
