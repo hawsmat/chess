@@ -135,7 +135,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
         if (move.getStartPosition() == null) {
-            sendMessage(session, new ErrorMessage("That game is not allowed"));
+            sendMessage(session, new ErrorMessage("That move is not allowed"));
             return;
         }
         if (game.getTeamTurn() != color) {
@@ -162,15 +162,52 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     public void leaveGame(Session session, String username, Leave command) throws Exception {
         String authToken = command.getAuthToken();
+        if (!dataAccess.isAuthorized(authToken)) {
+            sendMessage(session, new ErrorMessage("You are not authorized"));
+        }
         if (dataAccess.isAuthorized(authToken)) {
             connections.remove(command.getGameID(), session);
+            String message = String.format("%s left the game", username);
+            connections.broadcast(command.getGameID(), session, new Notification(message));
         }
         else {
             sendMessage(session, new ErrorMessage("You are not authorized"));
         }
     }
 
-    public void resign(Session session, String username, Resign command) throws Exception {}
+    public void resign(Session session, String username, Resign command) throws Exception {
+        ChessGame game = dataAccess.getChessGame(command.getGameID());
+        String authToken = command.getAuthToken();
+        ChessGame.TeamColor color;
+        if (dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
+            color = ChessGame.TeamColor.BLACK;
+        }
+        else if (dataAccess.getWhiteUsername(command.getGameID()).equals(username)) {
+            color = ChessGame.TeamColor.WHITE;
+        }
+        else {
+            sendMessage(session, new ErrorMessage("You are observing"));
+            return;
+        }
+        if (!dataAccess.isAuthorized(authToken)) {
+            sendMessage(session, new ErrorMessage("You are not authorized"));
+            return;
+        }
+        if (color == ChessGame.TeamColor.WHITE) {
+            sendMessage(session, new Notification("You Resigned! Black Won"));
+            dataAccess.updateUsernames(command.getGameID(), ChessGame.TeamColor.WHITE, null);
+            connections.remove(command.getGameID(), session);
+            String message = String.format("%s resigned! Black won!", username);
+            connections.broadcast(command.getGameID(), session, new Notification(message));
+        }
+        else {
+            sendMessage(session, new Notification("You Resigned! White Won"));
+            dataAccess.updateUsernames(command.getGameID(), ChessGame.TeamColor.BLACK, null);
+            connections.remove(command.getGameID(), session);
+            String message = String.format("%s resigned! White won!", username);
+            connections.broadcast(command.getGameID(), session, new Notification(message));
+        }
+    }
 
     public void sendMessage(Session session, ServerMessage serverMessage) {
         if (session.isOpen()) {
