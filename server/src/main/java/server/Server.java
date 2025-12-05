@@ -30,7 +30,8 @@ public class Server {
         gameService = new GameService(dataAccess);
         adminService = new AdminService(dataAccess);
 
-        server = Javalin.create(config -> config.staticFiles.add("web"));
+        server = Javalin.create(config ->
+            config.staticFiles.add("web"));
         WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess, gameService);
         server.ws("/ws", ws -> {
             ws.onConnect(webSocketHandler::handleConnect);

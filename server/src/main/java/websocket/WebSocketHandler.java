@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
@@ -12,7 +13,6 @@ import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import model.GameData;
-import model.LoginResult;
 import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import commands.Connect;
@@ -31,7 +31,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     DataAccess dataAccess;
     GameService gameService;
     private final ConnectionManager connections = new ConnectionManager();
-    Gson Serializer = new Gson();
+    Gson serializer = new Gson();
 
     public WebSocketHandler(DataAccess dataAccess, GameService gameService) {
         this.dataAccess = dataAccess;
@@ -46,10 +46,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(WsMessageContext ctx){
+        System.out.println("hello");
         int gameID = -1;
         Session session = ctx.session;
         try {
-            UserGameCommand command = Serializer.fromJson(
+            UserGameCommand command = serializer.fromJson(
                     ctx.message(), UserGameCommand.class);
             gameID = command.getGameID();
             if (!dataAccess.isAuthorized(command.getAuthToken())) {
@@ -59,19 +60,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String username = dataAccess.getAuthData(command.getAuthToken()).username();
             switch (command.getCommandType()) {
                 case CONNECT -> {
-                        Connect connect = Serializer.fromJson(ctx.message(), Connect.class);
+                        Connect connect = serializer.fromJson(ctx.message(), Connect.class);
                         connect(session, username, connect);
                 }
                 case MAKE_MOVE -> {
-                    MakeMove move = Serializer.fromJson(ctx.message(), MakeMove.class);
+                    MakeMove move = serializer.fromJson(ctx.message(), MakeMove.class);
                     makeMove(session, username, move);
                 }
                 case LEAVE -> {
-                    Leave leave = Serializer.fromJson(ctx.message(), Leave.class);
+                    Leave leave = serializer.fromJson(ctx.message(), Leave.class);
                     leaveGame(session, username, leave);
                 }
                 case RESIGN -> {
-                    Resign resign = Serializer.fromJson(ctx.message(), Resign.class);
+                    Resign resign = serializer.fromJson(ctx.message(), Resign.class);
                     resign(session, username, resign);
                 }
             }
@@ -96,19 +97,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
             if (gameData.blackUsername().equals(username)) {
                 sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
-                String message = String.format("%s is observing the game as Black", username);
+                String message = String.format("%s joined the game as Black", username);
                 Notification notification = new Notification(message);
                 connections.broadcast(command.getGameID(), session, notification);
             }
             else if (gameData.whiteUsername().equals(username)){
                 sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
-                String message = String.format("%s is observing the game as White", username);
+                String message = String.format("%s joined the game as White", username);
                 Notification notification = new Notification(message);
                 connections.broadcast(command.getGameID(), session, notification);
             }
             else {
                 sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
-                String message = String.format("%s has joined the game", username);
+                String message = String.format("%s is observing the game", username);
                 Notification notification = new Notification(message);
                 connections.broadcast(command.getGameID(), session, notification);
             }
@@ -132,16 +133,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             sendMessage(session, new ErrorMessage("You are observing"));
             return;
         }
-        if (!dataAccess.isAuthorized(authToken)) {
-            sendMessage(session, new ErrorMessage("You are not authorized"));
-            return;
-        }
-        if (game.isGameOver()) {
-            sendMessage(session, new ErrorMessage("The game is over"));
-            return;
-        }
-        if (move.getStartPosition() == null) {
-            sendMessage(session, new ErrorMessage("That move is not allowed"));
+        if (!inputsGood(session, command)) {
             return;
         }
         if (game.getTeamTurn() != color) {
@@ -192,9 +184,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     public void resign(Session session, String username, Resign command) throws Exception {
-        ChessGame game = dataAccess.getChessGame(command.getGameID());
-        String authToken = command.getAuthToken();
+        if (!inputsGood(session, command)) {
+            return;
+        }
         ChessGame.TeamColor color;
+        ChessGame game = dataAccess.getChessGame(command.getGameID());
         if (dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
             color = ChessGame.TeamColor.BLACK;
         }
@@ -203,14 +197,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         else {
             sendMessage(session, new ErrorMessage("You are observing"));
-            return;
-        }
-        if (!dataAccess.isAuthorized(authToken)) {
-            sendMessage(session, new ErrorMessage("You are not authorized"));
-            return;
-        }
-        if (game.isGameOver()) {
-            sendMessage(session, new ErrorMessage("The game is over"));
             return;
         }
         if (color == ChessGame.TeamColor.WHITE) {
@@ -231,10 +217,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
+    public boolean inputsGood(Session session, UserGameCommand command) throws DataAccessException {
+        ChessGame game = dataAccess.getChessGame(command.getGameID());
+        String authToken = command.getAuthToken();
+        if (!dataAccess.isAuthorized(authToken)) {
+            sendMessage(session, new ErrorMessage("You are not authorized"));
+            return false;
+        }
+        if (game.isGameOver()) {
+            sendMessage(session, new ErrorMessage("The game is over"));
+            return false;
+        }
+        return true;
+    }
+
     public void sendMessage(Session session, ServerMessage serverMessage) {
         if (session.isOpen()) {
             try {
-                session.getRemote().sendString(Serializer.toJson(serverMessage));
+                session.getRemote().sendString(serializer.toJson(serverMessage));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
