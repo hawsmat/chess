@@ -39,17 +39,4 @@ public class ConnectionManager {
             }
         }
     }
-
-    public void broadcastToAll(int gameID, LoadGame loadGame) {
-        if (connections.get(gameID) != null) {
-            for (Session c : connections.get(gameID)) {
-                String game = new Gson().toJson(loadGame.getGame());
-                try {
-                    c.getRemote().sendString(game);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
 }
