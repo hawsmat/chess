@@ -184,7 +184,6 @@ public class Client {
         } catch (Exception e) {
             throw new Exception("Game ID needs to be a number");
         }
-
         if (gameID <= 0) {
             throw new Exception("That Game ID does not exist");
         }
@@ -198,7 +197,7 @@ public class Client {
             }
             try {
                 serverFacade.connectWebSocket();
-                serverFacade.join(authToken, new JoinGameData(playerColor, gameID-1));
+                serverFacade.join(authToken, new JoinGameData(playerColor, gameID));
                 new Connect(serverFacade, getGame(gameID-1), playerColor, authToken).run();
                 return "";
             } catch (Exception e) {

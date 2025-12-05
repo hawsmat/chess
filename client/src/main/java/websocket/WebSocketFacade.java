@@ -1,11 +1,10 @@
 package websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import org.eclipse.jetty.http.HttpTester;
+import websocketmessages.ErrorMessage;
+import websocketmessages.LoadGame;
+import websocketmessages.Notification;
 import websocketmessages.ServerMessage;
 
 import java.io.IOException;
@@ -17,7 +16,14 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     Gson Serializer = new Gson();
 
-    public WebSocketFacade(String url) throws Exception {
+    public interface MessageListener {
+        void onMessage(ServerMessage message);
+    }
+
+    private MessageListener listener;
+
+    public WebSocketFacade(String url, MessageListener listener) throws Exception {
+        this.listener = listener;
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -40,17 +46,9 @@ public class WebSocketFacade extends Endpoint {
     private void handleMessage(String messageString) {
         try {
             ServerMessage message = Serializer.fromJson(messageString, ServerMessage.class);
-            if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-                return;
-            }
-            else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-                return;
-            }
-            else if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                return;
-            }
+            listener.onMessage(message);
         } catch (Exception e) {
-            System.out.println("");
+            System.out.println("Could not parse message");
         }
     }
         //Endpoint requires this method, but you don't have to do anything

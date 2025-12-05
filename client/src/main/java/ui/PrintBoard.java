@@ -42,7 +42,7 @@ public class PrintBoard {
                     printPiece(i, j, game.getBoard().getPiece(new ChessPosition(i, 9-j)));
                 }
             }
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.RESET_BG_COLOR + " " +rows.get(i-1));
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.RESET_BG_COLOR + " " +rows.get(7-(i-1)));
         }
         printCols(cols, initial, direction, end);
         System.out.println();

@@ -118,13 +118,13 @@ public class ServerFacade {
                 throw new Exception("You are not authorized");
             }
             else if (status == 403) {
-                throw new Exception("That is already taken.");
+                throw new Exception("That is already taken");
             }
             else {
-                throw new Exception("There was an internal error.");
+                throw new Exception("There was an internal error");
             }
         }
-        if (responseClass != null && body != null && !body.isBlank()) {
+        if (responseClass != null && !body.isBlank()) {
             return new Gson().fromJson(response.body(), responseClass);
         }
         return null;

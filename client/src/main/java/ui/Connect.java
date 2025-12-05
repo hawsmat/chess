@@ -3,24 +3,39 @@ package ui;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
+import com.google.gson.Gson;
 import serverfacade.ServerFacade;
 import commands.*;
+import websocket.WebSocketFacade;
+import websocketmessages.ErrorMessage;
+import websocketmessages.LoadGame;
+import websocketmessages.Notification;
+import websocketmessages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Connect {
-    public ServerFacade serverFacade;
+public class Connect implements WebSocketFacade.MessageListener {
+    private WebSocketFacade webSocketFacade;
     public ChessGame game;
     ChessGame.TeamColor color;
     String authToken;
     int gameID;
+    String url;
 
-    public Connect(ServerFacade serverFacade, ChessGame game, ChessGame.TeamColor color, String authToken){
-        this.serverFacade = serverFacade;
+    public Connect(String url, ChessGame game, ChessGame.TeamColor color, String authToken, int gameID){
+        this.url = url;
         this.game = game;
         this.color = color;
         this.authToken = authToken;
+        this.gameID = gameID;
+        try {
+            webSocketFacade = new WebSocketFacade(url, this);
+            commands.Connect connect = new commands.Connect(authToken, gameID);
+            webSocketFacade.sendCommand(new Gson().toJson(connect));
+        } catch (Exception e) {
+            throw new RuntimeException("Connection failed");
+        }
     }
 
     public void run() {
@@ -94,7 +109,8 @@ public class Connect {
             ChessPosition startPosition = convertToChessPosition(params[0]);
             ChessPosition endPosition = convertToChessPosition(params[1]);
             ChessMove chessMove = new ChessMove(startPosition, endPosition, null);
-            serverFacade.sendCommand(new MakeMove(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, chessMove));
+            MakeMove makeMove = new MakeMove(authToken, gameID, chessMove);
+            webSocketFacade.sendCommand(new Gson().toJson(makeMove));
             return "";
         } else {
             throw new Exception("Expected: {start position} {end position}");
@@ -151,5 +167,21 @@ public class Connect {
         }
 
         return new ChessPosition(row, col);
+    }
+
+    @Override
+    public void onMessage(ServerMessage message) {
+        if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+            System.out.println(errorMessage);
+        }
+        else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            Notification notification = new Gson().fromJson(message, Notification.class);
+            System.out.println(notification);
+        }
+        else if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            LoadGame loadGame = new Gson().fromJson(message, LoadGame.class);
+            System.out.println("Game has changed");
+        }
     }
 }

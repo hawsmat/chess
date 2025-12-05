@@ -82,10 +82,12 @@ class GameServiceTest {
         UserService userService = new UserService(memoryDataAccess);
         GameService gameService = new GameService(memoryDataAccess);
         UserData user = new UserData("matt", "joe", "email");
+        UserData user2 = new UserData("matt2", "joe", "email");
         LoginResult registerResult = assertDoesNotThrow(() -> userService.register(user));
+        LoginResult registerResult2 = assertDoesNotThrow(() -> userService.register(user2));
         int gameID = assertDoesNotThrow(()-> gameService.createGame(registerResult.authToken(), new CreateGameData("game")));
         assertDoesNotThrow(()-> gameService.joinGame(registerResult.authToken(), new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
-        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(registerResult.authToken(),
+        assertThrows(AlreadyTakenException.class, ()-> gameService.joinGame(registerResult2.authToken(),
                 new JoinGameData(ChessGame.TeamColor.WHITE, gameID)));
     }
 }

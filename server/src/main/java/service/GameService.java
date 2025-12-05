@@ -78,17 +78,11 @@ public class GameService {
             if (whiteTaken) {
                 throw new AlreadyTakenException("color already taken");
             }
-            if (username.equals(blackUsername)) {
-                throw new AlreadyTakenException("you joined as black");
-            }
             dataAccess.updateUsernames(joinGameData.gameID(), ChessGame.TeamColor.WHITE, username);
         }
         else {
             if (blackTaken) {
                 throw new AlreadyTakenException("color already taken");
-            }
-            if (username.equals(whiteUsername)) {
-                throw new AlreadyTakenException("you joined as white");
             }
             dataAccess.updateUsernames(joinGameData.gameID(), ChessGame.TeamColor.BLACK, username);
         }
