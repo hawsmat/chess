@@ -11,6 +11,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
+    boolean gameOver = false;
     TeamColor team = TeamColor.WHITE;
     ChessBoard board = new ChessBoard();
 
@@ -214,6 +215,10 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    public void endGame() {gameOver = true;}
+
+    public boolean isGameOver() {return gameOver;}
 
     @Override
     public boolean equals(Object o) {
