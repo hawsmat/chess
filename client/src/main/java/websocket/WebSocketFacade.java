@@ -12,19 +12,18 @@ public class WebSocketFacade extends Endpoint {
 
     Session session;
     Gson serializer = new Gson();
+    private MessageListener listener;
 
     public interface MessageListener {
         void onMessage(ServerMessage message);
     }
 
-    private MessageListener listener;
 
     public WebSocketFacade(String url, MessageListener listener) throws Exception {
         this.listener = listener;
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 

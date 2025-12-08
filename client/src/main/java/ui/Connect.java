@@ -2,8 +2,10 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
+import org.eclipse.jetty.server.Authentication;
 import serverfacade.ServerFacade;
 import commands.*;
 import websocket.WebSocketFacade;
@@ -16,12 +18,12 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Connect implements WebSocketFacade.MessageListener {
-    private WebSocketFacade webSocketFacade;
-    public ChessGame game;
+    private ChessGame game;
     ChessGame.TeamColor color;
     String authToken;
     int gameID;
     String url;
+    WebSocketFacade webSocketFacade;
 
     public Connect(String url, ChessGame game, ChessGame.TeamColor color, String authToken, int gameID){
         this.url = url;
@@ -30,9 +32,11 @@ public class Connect implements WebSocketFacade.MessageListener {
         this.authToken = authToken;
         this.gameID = gameID;
         try {
-            webSocketFacade = new WebSocketFacade(url, this);
-            commands.Connect connect = new commands.Connect(authToken, gameID);
-            webSocketFacade.sendCommand(new Gson().toJson(connect));
+            this.webSocketFacade = new WebSocketFacade(url, this);
+            UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            String command = new Gson().toJson(connect);
+            System.out.println("sending:" + command);
+            webSocketFacade.sendCommand(command);
         } catch (Exception e) {
             throw new RuntimeException("Connection failed");
         }
@@ -77,9 +81,9 @@ public class Connect implements WebSocketFacade.MessageListener {
                 params = new String[0];
             }
             return switch (command) {
-                case "leave" -> "leave";
-                case "redraw" -> redraw(params);
-                case "resign" -> resign(params);
+                case "leave" -> leave();
+                case "redraw" -> redraw();
+                case "resign" -> resign();
                 case "highlight" -> highlight(params);
                 case "move" -> move(params);
                 default -> "help";
@@ -112,17 +116,36 @@ public class Connect implements WebSocketFacade.MessageListener {
             MakeMove makeMove = new MakeMove(authToken, gameID, chessMove);
             webSocketFacade.sendCommand(new Gson().toJson(makeMove));
             return "";
-        } else {
+        }
+        else if (params.length == 3){
+            ChessPosition startPosition = convertToChessPosition(params[0]);
+            ChessPosition endPosition = convertToChessPosition(params[1]);
+            ChessPiece.PieceType type = convertToChessPiece(params[2]);
+            ChessMove chessMove = new ChessMove(startPosition, endPosition, type);
+            MakeMove makeMove = new MakeMove(authToken, gameID, chessMove);
+            webSocketFacade.sendCommand(new Gson().toJson(makeMove));
+            return "";
+        }
+        else {
             throw new Exception("Expected: {start position} {end position}");
         }
     }
 
-    public String redraw(String[] params) throws Exception {
+    public String redraw() {
         new PrintBoard(game, color, null);
         return "";
     }
 
-    public String resign(String[] params) throws Exception {
+    public String resign() {
+        System.out.println("Are you sure? Enter yes or anything else");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        String[] tokens = line.split(" ");
+        String input = tokens[0];
+        if (input.equals("yes")) {
+            String command = new Gson().toJson(new Resign(authToken, gameID));
+            webSocketFacade.sendCommand(command);
+        }
         return "";
     }
 
@@ -169,6 +192,24 @@ public class Connect implements WebSocketFacade.MessageListener {
         return new ChessPosition(row, col);
     }
 
+    public ChessPiece.PieceType convertToChessPiece(String string) throws Exception {
+        return switch (string) {
+            case "king" -> ChessPiece.PieceType.KING;
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "pawn" -> ChessPiece.PieceType.PAWN;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            default -> throw new Exception("Expected: king | queen | rook | pawn | knight | bishop");
+        };
+    }
+
+    public String leave() {
+        String leave = new Gson().toJson(new Leave(authToken, gameID));
+        webSocketFacade.sendCommand(leave);
+        return "leave";
+    }
+
     @Override
     public void onMessage(ServerMessage message) {
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
@@ -182,6 +223,7 @@ public class Connect implements WebSocketFacade.MessageListener {
         else if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGame loadGame = (LoadGame) message;
             this.game = loadGame.getGame();
+            redraw();
         }
         else {
             System.out.println("Could not parse the message");

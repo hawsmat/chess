@@ -232,7 +232,8 @@ public class Client {
                     throw new Exception("GameID does not exist");
                 }
                 serverFacade.join(authToken, new JoinGameData(null, gameID));
-                new Connect(serverUrl, getGame(gameID-1), null, authToken, gameID).run();
+                Connect connect = new Connect(serverUrl, getGame(gameID-1), null, authToken, gameID);
+                connect.run();
                 return "";
             } catch (Exception e) {
                 System.out.println(e.getMessage());

@@ -25,8 +25,8 @@ import websocketmessages.LoadGame;
 import websocketmessages.Notification;
 import websocketmessages.ServerMessage;
 
-import java.io.IOException;
 
+import java.io.IOException;
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     DataAccess dataAccess;
     GameService gameService;
@@ -41,12 +41,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
-        ctx.enableAutomaticPings();
+//        ctx.enableAutomaticPings();
     }
 
     @Override
     public void handleMessage(WsMessageContext ctx){
-        System.out.println("hello");
+        System.out.println(ctx.message());
+        System.out.println("hey");
         int gameID = -1;
         Session session = ctx.session;
         try {
@@ -95,13 +96,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 sendMessage(session, new ErrorMessage("You are not authorized"));
                 return;
             }
-            if (gameData.blackUsername().equals(username)) {
+            if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
                 sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
                 String message = String.format("%s joined the game as Black", username);
                 Notification notification = new Notification(message);
                 connections.broadcast(command.getGameID(), session, notification);
             }
-            else if (gameData.whiteUsername().equals(username)){
+            else if (gameData.whiteUsername() != null &&gameData.whiteUsername().equals(username)){
                 sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
                 String message = String.format("%s joined the game as White", username);
                 Notification notification = new Notification(message);
@@ -121,12 +122,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void makeMove(Session session, String username, MakeMove command) throws Exception {
         ChessMove move = command.move();
         ChessGame game = dataAccess.getChessGame(command.getGameID());
-        String authToken = command.getAuthToken();
         ChessGame.TeamColor color;
-        if (dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
+        if (dataAccess.getBlackUsername(command.getGameID()) != null &&
+                dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
             color = ChessGame.TeamColor.BLACK;
         }
-        else if (dataAccess.getWhiteUsername(command.getGameID()).equals(username)) {
+        else if (dataAccess.getWhiteUsername(command.getGameID()) != null &&
+                dataAccess.getWhiteUsername(command.getGameID()).equals(username)) {
             color = ChessGame.TeamColor.WHITE;
         }
         else {
@@ -152,6 +154,50 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 sendMessage(session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
                 connections.broadcast(command.getGameID(), session, new Notification(message));
                 connections.broadcast(command.getGameID(), session, new LoadGame(dataAccess.getChessGame(command.getGameID())));
+                if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                    String notification = "White is in checkmate, game over!";
+                    sendMessage(session, new Notification(notification));
+                    game.endGame();
+                    dataAccess.updateGame(command.getGameID(), game);
+                    connections.broadcast(command.getGameID(), session, new Notification(notification));
+                    return;
+                }
+                else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                    String notification = "Black is in checkmate, game over!";
+                    sendMessage(session, new Notification(notification));
+                    game.endGame();
+                    dataAccess.updateGame(command.getGameID(), game);
+                    connections.broadcast(command.getGameID(), session, new Notification(notification));
+                    return;
+                }
+                if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                    String notification = "White is in stalemate, game over!";
+                    sendMessage(session, new Notification(notification));
+                    game.endGame();
+                    dataAccess.updateGame(command.getGameID(), game);
+                    connections.broadcast(command.getGameID(), session, new Notification(notification));
+                    return;
+                }
+                else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                    String notification = "Black is in stalemate, game over!";
+                    sendMessage(session, new Notification(notification));
+                    game.endGame();
+                    dataAccess.updateGame(command.getGameID(), game);
+                    connections.broadcast(command.getGameID(), session, new Notification(notification));
+                    return;
+                }
+                if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                    String notification = "White is in check!";
+                    sendMessage(session, new Notification(notification));
+                    connections.broadcast(command.getGameID(), session, new Notification(notification));
+                    return;
+                }
+                else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                    String notification = "Black is in check!";
+                    sendMessage(session, new Notification(notification));
+                    connections.broadcast(command.getGameID(), session, new Notification(notification));
+                    return;
+                }
                 return;
             }
         }
@@ -189,10 +235,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         ChessGame.TeamColor color;
         ChessGame game = dataAccess.getChessGame(command.getGameID());
-        if (dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
+        if (dataAccess.getBlackUsername(command.getGameID()) != null &&
+                dataAccess.getBlackUsername(command.getGameID()).equals(username)) {
             color = ChessGame.TeamColor.BLACK;
         }
-        else if (dataAccess.getWhiteUsername(command.getGameID()).equals(username)) {
+        else if (dataAccess.getWhiteUsername(command.getGameID()) != null &&
+                dataAccess.getWhiteUsername(command.getGameID()).equals(username)) {
             color = ChessGame.TeamColor.WHITE;
         }
         else {
@@ -243,6 +291,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleClose(WsCloseContext ctx) {
-        System.out.println("Websocket closed");
+        System.out.println("Websocket closed: " + ctx.reason() + " reason: " + ctx.status());
     }
 }

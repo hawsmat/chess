@@ -34,9 +34,12 @@ public class Server {
             config.staticFiles.add("web"));
         WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess, gameService);
         server.ws("/ws", ws -> {
-            ws.onConnect(webSocketHandler::handleConnect);
-            ws.onMessage(webSocketHandler::handleMessage);
-            ws.onClose(webSocketHandler::handleClose);
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(ctx -> {
+                System.out.println("🔴 RAW MESSAGE RECEIVED: " + ctx.message());  // ← ADD THIS
+                webSocketHandler.handleMessage(ctx);  // Then call your handler
+            });
+            ws.onClose(webSocketHandler);
         });
         server.delete("/db", this::clear);
         server.post("/user", this::register);
